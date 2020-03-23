@@ -35,61 +35,6 @@ def city_into_dict(piece_of_json):
     print(dictionary)
     return dictionary
 
-# connection = sql.connect('DATABASE.sqlite')
-# q = connection.cursor()
-# q.execute('''
-# 			CREATE TABLE "user" (
-# 				'id' TEXT,
-# 				'model_car' TEXT,
-# 				'vin_code' TEXT,
-# 				'number_car' TEXT,
-# 				'category' TEXT,
-# 				'car_year' TEXT,
-# 				'surname' TEXT,
-# 				'name' TEXT,
-# 				'patronymic' TEXT,
-# 				'date_of_birth' TEXT,
-# 				'address' TEXT,
-# 				'inn' TEXT,
-# 				'email' TEXT,
-# 				'phone' TEXT
-# 			)''')
-# connection.commit()
-# q.close()
-# connection.close()
-#
-# connection = sql.connect('DATABASE.sqlite')
-# q = connection.cursor()
-# q.execute('''
-# 			CREATE TABLE "passport" (
-# 			    'id' TEXT,
-# 			    'series' TEXT,
-# 			    'number' TEXT,
-# 			    'date' TEXT,
-# 			    'issued_by' TEXT
-# 			)''')
-# connection.commit()
-# q.close()
-# connection.close()
-
-# connection = sql.connect('DATABASE.sqlite')
-# q = connection.cursor()
-# q.execute('''
-# 			CREATE TABLE "utility" (
-# 			    'id' TEXT,
-# 			    'cities' TEXT,
-# 			    'final_city_id' TEXT,
-# 			    'tariffs' TEXT,
-# 			    'tariff_type' TEXT,
-# 			    'tariff_id' TEXT,
-# 			    'tariff_payment' TEXT,
-# 			    'tariff_discounted_payment' TEXT,
-# 			    'tariff_name' TEXT,
-# 			    'contract_ids' TEXT
-# 			)''')
-# connection.commit()
-# q.close()
-# connection.close()
 
 utility = {}
 
@@ -122,8 +67,6 @@ data = {
     'password': config.password  # hashed
 }
 response = requests.post('https://web.ewa.ua/ewa/api/v9/user/login', headers=headers, data=data)
-# 'https://web.ewa.ua/ewa/api/v9/tariff/choose/policy?salePoint=32070&customerCategory=NATURAL&taxi=false&autoCategory=B1&registrationPlace=7&outsideUkraine=false&registrationType=PERMANENT_WITHOUT_OTK&dateFrom=2019-12-01&dateTo=2020-11-30&usageMonths=0
-#                                                        salePoint        customerCategory         taxi          category            id                 outside_ua        registration_type                date_from_req_      date_to_req      usage_months
 cookie = response.json()['sessionId']
 sale_point = response.json()['user']['salePoint']['id']
 user = response.json()['user']['id']
@@ -308,20 +251,6 @@ def final_city(message):
     city_response = requests.get(url, headers=headers, cookies=cookies)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     print(city_response.json())
-    # for city in city_response.json():
-    #     dictionary = {
-    #         'name_full': city['nameFull'],
-    #         'id': city['id']
-    #     }
-    #     cities.append(dictionary)
-    # utility.update({str(message.chat.id) + 'cities': cities})
-    # cities.clear()
-    # goroda_from_dict = utility.get(str(message.chat.id) + 'cities')
-    # # cities.clear()
-    # print(cities)
-    # for c in cities[0:4]:
-    #     button = types.KeyboardButton(c['name_full'])
-    #     markup.add(button)
     if city_response.json() == []:
         bot.send_message(message.chat.id, 'Таке місто не знайдено. Спробуйте ще раз')
         dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
@@ -460,18 +389,6 @@ def submitting(message):
                      reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
     except TypeError:
         pass
-    # for tariff in response.json():
-    #     tariffs.append(tariff)
-    #     insurer_name = tariff['tariff']['insurer']['namePrint']
-    #     payment = tariff['payment']
-    #     franchise = tariff['tariff']['franchise']
-    #     id = tariff['tariff']['id']
-    #     markup = types.InlineKeyboardMarkup()
-    #     button = types.InlineKeyboardButton(text='Оформити', callback_data=id)
-    #     markup.add(button)
-    #     bot.send_message(message.chat.id,
-    #                      f'👔Страховик: {insurer_name}\n💵Вартість: {payment}\n💼Франшиза: {franchise}',
-    #                      reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -1037,76 +954,9 @@ def otp(message):
     q.close()
     connection.close()
 
-    # WAY FOR PAY
-
     random_integer = random.randint(10000, 99999)
     payment = utility.get(str(message.chat.id) + 'tariff_payment')
     product_name = f"ОСАЦВ від - {utility.get(str(message.chat.id) + 'tariff_name')}"
-    # # # запрос в платежную систему
-    # stri = f'zarazpolis_pp_ua;https://t.me/osago_insurance_bot;order{str(random_integer)};{message.date};1;UAH;{product_name};1;1'  # payment
-    # key = config.wfp_key
-    # hash = hmac.new(key.encode('utf-8'), stri.encode('utf-8')).hexdigest()
-    # print(hash)
-    # d = {
-    #     "transactionType": "CREATE_INVOICE",
-    #     "merchantAccount": "zarazpolis_pp_ua",
-    #     "merchantDomainName": "https://t.me/osago_insurance_bot",
-    #     "merchantSignature": hash,
-    #     "apiVersion": 1,
-    #     "language": 'ru',
-    #     "serviceUrl": 'http://serviceurl.com',
-    #     "orderReference": f'order{str(random_integer)}',  # тут мое рандомное число
-    #     "orderDate": message.date,
-    #     "amount": '1',  # r.json()['insuranceObject']['payment']
-    #     "currency": "UAH",
-    #     "orderTimeout": 86400,
-    #     "productName": [product_name],
-    #     "productPrice": ['1'],  # r.json()['insuranceObject']['payment']
-    #     "productCount": [1],
-    #     "clientFirstName": results[0][6],
-    #     "clientLastName": results[0][7],
-    #     # "clientEmail": results[0][12],
-    #     "clientPhone": results[0][13]
-    # }
-    # d_dumped = json.dumps(d)
-    # print(d)
-    # r2 = requests.post('https://api.wayforpay.com/api', data=d_dumped)
-    # print(r2)
-    # print(r2.json())
-    # invoice = r2.json()['invoiceUrl']
-    # bot.send_message(message.chat.id, f'Для оплаты перейдите по ссылке💳⬇\n{invoice}')
-    # # Здесь должна быть проверка статуса платежа
-    # stri1 = f'zarazpolis_pp_ua;order{str(random_integer)}'
-    # hash1 = hmac.new(key.encode('utf-8'), stri1.encode('utf-8')).hexdigest()
-    # print(hash1)
-    # d1 = {
-    #     "transactionType": "CHECK_STATUS",
-    #     "merchantAccount": "zarazpolis_pp_ua",
-    #     "orderReference": f'order{str(random_integer)}',
-    #     "merchantSignature": hash1,
-    #     "apiVersion": 1
-    # }
-    # d1_dumped = json.dumps(d1)
-    # print(d1)
-    # bot.send_message(message.chat.id,
-    #                  'Після оплати очікуйте підтверждження платежа⏳(зазвичай це займає ~5-10 хвилин)\nКоли платіж буди прийнятий вам на електронну пошту прийде повідомлення📧')
-    # while True:
-    #     r3 = requests.post('https://api.wayforpay.com/api', data=d1_dumped)
-    #     print(r3.json())
-    #     print(r3.json()['transactionStatus'])
-    #     if r3.json()['transactionStatus'] == 'Approved':
-    #         print('Платёж прошел. Всё найс')
-    #         bot.send_message(message.chat.id,
-    #                          'Платіж пройшов успішно!📠 Незабаром ваш на пошту прийде ваш поліс ОСАЦВ📬')
-    #         url_for_emi = f'https://web.ewa.ua/ewa/api/v9/contract/{contract_ids[0]}/state/EMITTED'
-    #         rf = requests.post(url_for_emi, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАЯВЛЕН
-    #         print(rf)
-    #         print(rf.json())
-    #         break
-    #     if r3.json()['transactionStatus'] == 'Expired':
-    #         bot.send_message(message.chat.id,
-    #                          'Закінчився термін оплати. Перезапустіть бота /reset щоб почати оформлення з початку')
-    #         break
 
     # LIQPAY
     order = f'order{str(random_integer)}'
@@ -1417,26 +1267,7 @@ def issued_taking_again(message):
     q.close()
     connection.close()
     prefinal(message)
-
-
-"""
-    Баги:
-        слияние сессий
-        реверс списка тарифов
-    Перспективы:
-        распознавание документа(тех паспорт авто)
-        BankID
-        2 метода оплаты(комп wfp тлф liqpay) потенциально невозможно
-        Напоминалка за 2 до конца полиса
-        залить на сервер
-        QR - code с Liqpay для оплаты с компа
-    TO DO LIST:
-        1. Поменять пароль логин евы
-        2. Поменять токен liqpay
-        
-    Cool ideas:
-        Создать двумерный массив который идентифицируется по id чата
-"""
+    
 
 # BOT RUNNING
 if __name__ == '__main__':
