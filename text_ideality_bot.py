@@ -35,6 +35,61 @@ def city_into_dict(piece_of_json):
     print(dictionary)
     return dictionary
 
+# connection = sql.connect('DATABASE.sqlite')
+# q = connection.cursor()
+# q.execute('''
+# 			CREATE TABLE "user" (
+# 				'id' TEXT,
+# 				'model_car' TEXT,
+# 				'vin_code' TEXT,
+# 				'number_car' TEXT,
+# 				'category' TEXT,
+# 				'car_year' TEXT,
+# 				'surname' TEXT,
+# 				'name' TEXT,
+# 				'patronymic' TEXT,
+# 				'date_of_birth' TEXT,
+# 				'address' TEXT,
+# 				'inn' TEXT,
+# 				'email' TEXT,
+# 				'phone' TEXT
+# 			)''')
+# connection.commit()
+# q.close()
+# connection.close()
+#
+# connection = sql.connect('DATABASE.sqlite')
+# q = connection.cursor()
+# q.execute('''
+# 			CREATE TABLE "passport" (
+# 			    'id' TEXT,
+# 			    'series' TEXT,
+# 			    'number' TEXT,
+# 			    'date' TEXT,
+# 			    'issued_by' TEXT
+# 			)''')
+# connection.commit()
+# q.close()
+# connection.close()
+
+# connection = sql.connect('DATABASE.sqlite')
+# q = connection.cursor()
+# q.execute('''
+# 			CREATE TABLE "utility" (
+# 			    'id' TEXT,
+# 			    'cities' TEXT,
+# 			    'final_city_id' TEXT,
+# 			    'tariffs' TEXT,
+# 			    'tariff_type' TEXT,
+# 			    'tariff_id' TEXT,
+# 			    'tariff_payment' TEXT,
+# 			    'tariff_discounted_payment' TEXT,
+# 			    'tariff_name' TEXT,
+# 			    'contract_ids' TEXT
+# 			)''')
+# connection.commit()
+# q.close()
+# connection.close()
 
 utility = {}
 
@@ -44,9 +99,12 @@ def date_from_to(message):
     date_from = datetime.fromtimestamp(int(date_raw)).strftime('%Y-%m-%d %H:%M:%S')
     date_from_list = date_from.split(' ')
     day_plus_one = int(date_from_list[0].split('-')[2]) + 1
+    date_plus_one_day = date_from_list[0].split('-')[0] + '-' + date_from_list[0].split('-')[1] + '-' + str(
+        day_plus_one).zfill(2)  # Завтрашняя дата
     if str(day_plus_one) == '32' or str(day_plus_one) == '31':
         day_plus_one = '1'
-    date_plus_one_day = date_from_list[0].split('-')[0] + '-' + date_from_list[0].split('-')[1] + '-' + str(
+        month_plus_one = int(date_from_list[0].split('-')[1]) + 1
+        date_plus_one_day = date_from_list[0].split('-')[0] + '-' + str(month_plus_one).zfill(2) + '-' + str(
         day_plus_one).zfill(2)  # Завтрашняя дата
     date_from_ewa = date_plus_one_day + 'T22:00:00.000+0000'  # Дата в формате евы
     date_from_for_req = date_from_ewa.split('T')[0]  # Дата нужна для запрос на поиск полиса ОСАГО
@@ -67,6 +125,8 @@ data = {
     'password': config.password  # hashed
 }
 response = requests.post('https://web.ewa.ua/ewa/api/v9/user/login', headers=headers, data=data)
+# 'https://web.ewa.ua/ewa/api/v9/tariff/choose/policy?salePoint=32070&customerCategory=NATURAL&taxi=false&autoCategory=B1&registrationPlace=7&outsideUkraine=false&registrationType=PERMANENT_WITHOUT_OTK&dateFrom=2019-12-01&dateTo=2020-11-30&usageMonths=0
+#                                                        salePoint        customerCategory         taxi          category            id                 outside_ua        registration_type                date_from_req_      date_to_req      usage_months
 cookie = response.json()['sessionId']
 sale_point = response.json()['user']['salePoint']['id']
 user = response.json()['user']['id']
@@ -133,7 +193,7 @@ def help(message):
 @bot.message_handler(commands=['rules'])
 def rules(message):
     bot.send_message(message.chat.id,
-                     'Угода (далі - "правила", "угода") ресурсу та бота Zaraz Polis (далі - «Ресурс») Використання інформаційно-аналітичного ресурсу Zaraz Polis Користувачем означає, що Користувач приймає і зобов\'язується дотримуватися всіх нижченаведених умов цієї Угоди. Адміністрація ресурсу залишає за собою право вносити до Угоди зміни, які вступають в силу з моменту публікації. Подальше використання ресурсу після внесення подібних змін означає вашу згоду з ними.')
+                     '❗Сессія триває 15 хвилин❗\nТобіж у вас є 15 хвилин, щоб ввести всі дані та дійти до оплати.\nУгода (далі - "правила", "угода") ресурсу та бота Zaraz Polis (далі - «Ресурс») Використання інформаційно-аналітичного ресурсу Zaraz Polis Користувачем означає, що Користувач приймає і зобов\'язується дотримуватися всіх нижченаведених умов цієї Угоди. Адміністрація ресурсу залишає за собою право вносити до Угоди зміни, які вступають в силу з моменту публікації. Подальше використання ресурсу після внесення подібних змін означає вашу згоду з ними.\n Повна угода за посиланям - http://zarazpolis.pp.ua/confidentiality.html')
 
 
 @bot.message_handler(commands=['start'])
@@ -142,7 +202,7 @@ def hello(message):
     button1 = types.KeyboardButton('Оформити ОСЦВ 🚗')
     markup.add(button1)
     bot.send_message(message.chat.id,
-                     'Добридень {0.first_name}, вас вітає бот для оформлення ОСЦВ - {1.first_name}🚘'.format(
+                     'Добридень {0.first_name}, вас вітає бот для оформлення ОСЦВ - {1.first_name}🚘 \n❗Зауважте, сессія триває 15 хвилин❗'.format(
                          message.from_user, bot.get_me()), reply_markup=markup)
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -190,31 +250,6 @@ def auto_number(message):
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_NUMBER_CAR.value)
 def asking_city(message):
     number_car = urllib.parse.quote(message.text)
-    car_number = str(message.text).upper()
-    try:
-        with open('tz_opendata_z01012020_po01032020.csv', encoding="utf8") as f:
-            reader = csv.reader(f, delimiter=';')
-            for row in reader:
-                for s in row:
-                    if car_number in s:
-                        year = s.split(';')[9]
-                        utility.update({str(message.chat.id) + 'car_year': str(year)})
-                        connection = sql.connect('DATABASE.sqlite')
-                        q = connection.cursor()
-                        q.execute("UPDATE user SET car_year='%s' WHERE id='%s'" % (year, message.from_user.id))
-                        connection.commit()
-                        q.close()
-                        connection.close()
-                        print(year)
-    except:
-        year = ''
-        utility.update({str(message.chat.id) + 'car_year': str(year)})
-        connection = sql.connect('DATABASE.sqlite')
-        q = connection.cursor()
-        q.execute("UPDATE user SET car_year='%s' WHERE id='%s'" % (year, message.from_user.id))
-        connection.commit()
-        q.close()
-        connection.close()
     url = f'https://web.ewa.ua/ewa/api/v9/auto/mtibu/number?query={number_car}'
     response = requests.get(url, headers=headers, cookies=cookies)
     print(response.json())
@@ -251,6 +286,20 @@ def final_city(message):
     city_response = requests.get(url, headers=headers, cookies=cookies)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     print(city_response.json())
+    # for city in city_response.json():
+    #     dictionary = {
+    #         'name_full': city['nameFull'],
+    #         'id': city['id']
+    #     }
+    #     cities.append(dictionary)
+    # utility.update({str(message.chat.id) + 'cities': cities})
+    # cities.clear()
+    # goroda_from_dict = utility.get(str(message.chat.id) + 'cities')
+    # # cities.clear()
+    # print(cities)
+    # for c in cities[0:4]:
+    #     button = types.KeyboardButton(c['name_full'])
+    #     markup.add(button)
     if city_response.json() == []:
         bot.send_message(message.chat.id, 'Таке місто не знайдено. Спробуйте ще раз')
         dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
@@ -389,6 +438,18 @@ def submitting(message):
                      reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
     except TypeError:
         pass
+    # for tariff in response.json():
+    #     tariffs.append(tariff)
+    #     insurer_name = tariff['tariff']['insurer']['namePrint']
+    #     payment = tariff['payment']
+    #     franchise = tariff['tariff']['franchise']
+    #     id = tariff['tariff']['id']
+    #     markup = types.InlineKeyboardMarkup()
+    #     button = types.InlineKeyboardButton(text='Оформити', callback_data=id)
+    #     markup.add(button)
+    #     bot.send_message(message.chat.id,
+    #                      f'👔Страховик: {insurer_name}\n💵Вартість: {payment}\n💼Франшиза: {franchise}',
+    #                      reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -954,9 +1015,76 @@ def otp(message):
     q.close()
     connection.close()
 
+    # WAY FOR PAY
+
     random_integer = random.randint(10000, 99999)
     payment = utility.get(str(message.chat.id) + 'tariff_payment')
     product_name = f"ОСАЦВ від - {utility.get(str(message.chat.id) + 'tariff_name')}"
+    # # # запрос в платежную систему
+    # stri = f'zarazpolis_pp_ua;https://t.me/osago_insurance_bot;order{str(random_integer)};{message.date};1;UAH;{product_name};1;1'  # payment
+    # key = config.wfp_key
+    # hash = hmac.new(key.encode('utf-8'), stri.encode('utf-8')).hexdigest()
+    # print(hash)
+    # d = {
+    #     "transactionType": "CREATE_INVOICE",
+    #     "merchantAccount": "zarazpolis_pp_ua",
+    #     "merchantDomainName": "https://t.me/osago_insurance_bot",
+    #     "merchantSignature": hash,
+    #     "apiVersion": 1,
+    #     "language": 'ru',
+    #     "serviceUrl": 'http://serviceurl.com',
+    #     "orderReference": f'order{str(random_integer)}',  # тут мое рандомное число
+    #     "orderDate": message.date,
+    #     "amount": '1',  # r.json()['insuranceObject']['payment']
+    #     "currency": "UAH",
+    #     "orderTimeout": 86400,
+    #     "productName": [product_name],
+    #     "productPrice": ['1'],  # r.json()['insuranceObject']['payment']
+    #     "productCount": [1],
+    #     "clientFirstName": results[0][6],
+    #     "clientLastName": results[0][7],
+    #     # "clientEmail": results[0][12],
+    #     "clientPhone": results[0][13]
+    # }
+    # d_dumped = json.dumps(d)
+    # print(d)
+    # r2 = requests.post('https://api.wayforpay.com/api', data=d_dumped)
+    # print(r2)
+    # print(r2.json())
+    # invoice = r2.json()['invoiceUrl']
+    # bot.send_message(message.chat.id, f'Для оплаты перейдите по ссылке💳⬇\n{invoice}')
+    # # Здесь должна быть проверка статуса платежа
+    # stri1 = f'zarazpolis_pp_ua;order{str(random_integer)}'
+    # hash1 = hmac.new(key.encode('utf-8'), stri1.encode('utf-8')).hexdigest()
+    # print(hash1)
+    # d1 = {
+    #     "transactionType": "CHECK_STATUS",
+    #     "merchantAccount": "zarazpolis_pp_ua",
+    #     "orderReference": f'order{str(random_integer)}',
+    #     "merchantSignature": hash1,
+    #     "apiVersion": 1
+    # }
+    # d1_dumped = json.dumps(d1)
+    # print(d1)
+    # bot.send_message(message.chat.id,
+    #                  'Після оплати очікуйте підтверждження платежа⏳(зазвичай це займає ~5-10 хвилин)\nКоли платіж буди прийнятий вам на електронну пошту прийде повідомлення📧')
+    # while True:
+    #     r3 = requests.post('https://api.wayforpay.com/api', data=d1_dumped)
+    #     print(r3.json())
+    #     print(r3.json()['transactionStatus'])
+    #     if r3.json()['transactionStatus'] == 'Approved':
+    #         print('Платёж прошел. Всё найс')
+    #         bot.send_message(message.chat.id,
+    #                          'Платіж пройшов успішно!📠 Незабаром ваш на пошту прийде ваш поліс ОСАЦВ📬')
+    #         url_for_emi = f'https://web.ewa.ua/ewa/api/v9/contract/{contract_ids[0]}/state/EMITTED'
+    #         rf = requests.post(url_for_emi, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАЯВЛЕН
+    #         print(rf)
+    #         print(rf.json())
+    #         break
+    #     if r3.json()['transactionStatus'] == 'Expired':
+    #         bot.send_message(message.chat.id,
+    #                          'Закінчився термін оплати. Перезапустіть бота /reset щоб почати оформлення з початку')
+    #         break
 
     # LIQPAY
     order = f'order{str(random_integer)}'
@@ -1267,7 +1395,25 @@ def issued_taking_again(message):
     q.close()
     connection.close()
     prefinal(message)
-    
+
+
+"""
+    Баги:
+        слияние сессий
+        реверс списка тарифов
+    Перспективы:
+        распознавание документа(тех паспорт авто)
+        BankID
+        2 метода оплаты(комп wfp тлф liqpay) потенциально невозможно
+        Напоминалка за 2 до конца полиса
+        залить на сервер
+        QR - code с Liqpay для оплаты с компа
+    TO DO LIST:
+        1. Докачать базы
+        
+    Cool ideas:
+        Создать двумерный массив который идентифицируется по id чата
+"""
 
 # BOT RUNNING
 if __name__ == '__main__':
