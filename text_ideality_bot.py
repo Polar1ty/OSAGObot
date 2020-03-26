@@ -8,7 +8,6 @@ import requests
 import sqlite3 as sql
 import json
 import random
-import csv
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -162,7 +161,6 @@ def reset(message):
         utility.pop(str(message.chat.id) + 'tariff6')
         utility.pop(str(message.chat.id) + 'tariff7')
         utility.pop(str(message.chat.id) + 'tariff8')
-        utility.pop(str(message.chat.id) + 'car_year')
         bot.send_message(message.chat.id,
                          '🚀База тимчасових станів очищена.\n Щоб почати оформлення спочатку напишіть /start')
     except FileNotFoundError:
@@ -178,7 +176,6 @@ def reset(message):
         utility.pop(str(message.chat.id) + 'tariff6')
         utility.pop(str(message.chat.id) + 'tariff7')
         utility.pop(str(message.chat.id) + 'tariff8')
-        utility.pop(str(message.chat.id) + 'car_year')
         bot.send_message(message.chat.id, 'Ще не було скоєно ніяких дій🧐')
     except KeyError:
         bot.send_message(message.chat.id,
@@ -198,46 +195,74 @@ def rules(message):
 
 @bot.message_handler(commands=['start'])
 def hello(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    button1 = types.KeyboardButton('Оформити ОСЦВ 🚗')
-    markup.add(button1)
-    bot.send_message(message.chat.id,
-                     'Добридень {0.first_name}, вас вітає бот для оформлення ОСЦВ - {1.first_name}🚘 \n❗Зауважте, сессія триває 15 хвилин❗'.format(
-                         message.from_user, bot.get_me()), reply_markup=markup)
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
     results1 = q.fetchone()
     if results1[0] != 1:
         print('nice')
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        button1 = types.KeyboardButton('Оформити ОСЦВ 🚗')
+        markup.add(button1)
+        bot.send_message(message.chat.id,
+                         'Добридень {0.first_name}, вас вітає бот для оформлення ОСЦВ - {1.first_name}🚘 \n❗Зауважте, сессія триває 15 хвилин❗'.format(
+                             message.from_user, bot.get_me()), reply_markup=markup)
         q.execute("INSERT INTO 'user' (id) VALUES ('%s')" % message.from_user.id)
-    connection.commit()
-    q.close()
-    connection.close()
-    utility = {
-        str(message.chat.id) + 'city1': '',
-        str(message.chat.id) + 'city2': '',
-        str(message.chat.id) + 'city3': '',
-        str(message.chat.id) + 'city4': '',
-        str(message.chat.id) + 'final_city_id': '',
-        str(message.chat.id) + 'tariff1': '',
-        str(message.chat.id) + 'tariff2': '',
-        str(message.chat.id) + 'tariff3': '',
-        str(message.chat.id) + 'tariff4': '',
-        str(message.chat.id) + 'tariff5': '',
-        str(message.chat.id) + 'tariff6': '',
-        str(message.chat.id) + 'tariff7': '',
-        str(message.chat.id) + 'tariff8': '',
-        str(message.chat.id) + 'tariff_type': '',
-        str(message.chat.id) + 'tariff_id': '',
-        str(message.chat.id) + 'tariff_payment': '',
-        str(message.chat.id) + 'tariff_discounted_payment': '',
-        str(message.chat.id) + 'tariff_name': '',
-        str(message.chat.id) + 'contract_id': '',
-        str(message.chat.id) + 'min_bonus_malus': '',
-        str(message.chat.id) + 'car_year': ''
-    }
-    print(utility)
+        connection.commit()
+        q.close()
+        connection.close()
+        utility = {
+            str(message.chat.id) + 'city1': '',
+            str(message.chat.id) + 'city2': '',
+            str(message.chat.id) + 'city3': '',
+            str(message.chat.id) + 'city4': '',
+            str(message.chat.id) + 'final_city_id': '',
+            str(message.chat.id) + 'tariff1': '',
+            str(message.chat.id) + 'tariff2': '',
+            str(message.chat.id) + 'tariff3': '',
+            str(message.chat.id) + 'tariff4': '',
+            str(message.chat.id) + 'tariff5': '',
+            str(message.chat.id) + 'tariff6': '',
+            str(message.chat.id) + 'tariff7': '',
+            str(message.chat.id) + 'tariff8': '',
+            str(message.chat.id) + 'tariff_type': '',
+            str(message.chat.id) + 'tariff_id': '',
+            str(message.chat.id) + 'tariff_payment': '',
+            str(message.chat.id) + 'tariff_discounted_payment': '',
+            str(message.chat.id) + 'tariff_name': '',
+            str(message.chat.id) + 'contract_id': '',
+            str(message.chat.id) + 'min_bonus_malus': '',
+            str(message.chat.id) + 'car_year': ''
+        }
+    else:
+        bot.send_message(message.chat.id, 'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
+        connection.commit()
+        q.close()
+        connection.close()
+        utility = {
+            str(message.chat.id) + 'city1': '',
+            str(message.chat.id) + 'city2': '',
+            str(message.chat.id) + 'city3': '',
+            str(message.chat.id) + 'city4': '',
+            str(message.chat.id) + 'final_city_id': '',
+            str(message.chat.id) + 'tariff1': '',
+            str(message.chat.id) + 'tariff2': '',
+            str(message.chat.id) + 'tariff3': '',
+            str(message.chat.id) + 'tariff4': '',
+            str(message.chat.id) + 'tariff5': '',
+            str(message.chat.id) + 'tariff6': '',
+            str(message.chat.id) + 'tariff7': '',
+            str(message.chat.id) + 'tariff8': '',
+            str(message.chat.id) + 'tariff_type': '',
+            str(message.chat.id) + 'tariff_id': '',
+            str(message.chat.id) + 'tariff_payment': '',
+            str(message.chat.id) + 'tariff_discounted_payment': '',
+            str(message.chat.id) + 'tariff_name': '',
+            str(message.chat.id) + 'contract_id': '',
+            str(message.chat.id) + 'min_bonus_malus': '',
+            str(message.chat.id) + 'car_year': ''
+        }
+        prefinal(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Оформити ОСЦВ 🚗')
@@ -815,9 +840,10 @@ def issued_taking(message):
 
 def prefinal(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    button1 = types.KeyboardButton('Так')
-    button2 = types.KeyboardButton('Ні')
-    markup.add(button1, button2)
+    button1 = types.KeyboardButton('Так✔')
+    button2 = types.KeyboardButton('Змінити✖')
+    button3 = types.KeyboardButton('Спочатку🔄')
+    markup.add(button1, button2, button3)
     bot.send_message(message.chat.id, 'Підтвердіть правильність введених данних')
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -836,7 +862,12 @@ def prefinal(message):
     dbworker.clear_db(message.chat.id)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Так')
+@bot.message_handler(func=lambda message: message.text == 'Спочатку🔄')
+def again(message):
+    auto_number(message)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Так✔')
 def yes(message):
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -978,25 +1009,29 @@ def yes(message):
                       data=json_string)  # Перевод договора в состояние ЧЕРНОВИК
     print(r)
     print(r.json())
+    bad_data = 0
     try:
         id_contract = r.json()['id']
         utility.update({str(message.chat.id) + 'contract_id': id_contract})
     except KeyError:
         print('Какое-то из значений было введено неправильно')
         bot.send_message(message.chat.id, 'Якісь дані були введені некоректно. Спробуйте ще')
-        car_year_taking(message)
-    contract = utility.get(str(message.chat.id) + 'contract_id')
-    url_for_req = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/state/REQUEST'
-    r1 = requests.post(url_for_req, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАЯВЛЕН
-    print(r1)
-    print(r1.json())
-    url_for_otp = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/otp/send?customer=true'
-    r_otp = requests.get(url_for_otp, headers=headers, cookies=cookies)
-    print(r_otp)
-    print(r_otp.json())
-    bot.send_message(message.chat.id,
-                     'Вам на телефон було відправлено СМС з паролем для укладання договору📲\nВведіть пароль з повідомлення✏')
-    dbworker.set_state(message.chat.id, config.States.S_OTP.value)
+        bad_data = 1
+    if bad_data == 1:
+        auto_number(message)
+    else:
+        contract = utility.get(str(message.chat.id) + 'contract_id')
+        url_for_req = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/state/REQUEST'
+        r1 = requests.post(url_for_req, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАЯВЛЕН
+        print(r1)
+        print(r1.json())
+        url_for_otp = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/otp/send?customer=true'
+        r_otp = requests.get(url_for_otp, headers=headers, cookies=cookies)
+        print(r_otp)
+        print(r_otp.json())
+        bot.send_message(message.chat.id,
+                         'Вам на телефон було відправлено СМС з паролем для укладання договору📲\nВведіть пароль з повідомлення✏')
+        dbworker.set_state(message.chat.id, config.States.S_OTP.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_OTP.value)
@@ -1138,7 +1173,7 @@ def process_successful_payment(message: types.Message):
 
 
 
-@bot.message_handler(func=lambda message: message.text == 'Ні')
+@bot.message_handler(func=lambda message: message.text == 'Змінити✖')
 def no(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     button1 = types.KeyboardButton('Рік випуску')
