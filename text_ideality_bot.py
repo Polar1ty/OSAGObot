@@ -744,15 +744,19 @@ def address_taking(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_INN.value)
 def inn_taking(message):
     inn = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET inn='%s' WHERE id='%s'" % (inn, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    # database
-    bot.send_message(message.chat.id, 'Введіть ваш email(сюди буде висланий поліс):')
-    dbworker.set_state(message.chat.id, config.States.S_EMAIL.value)
+    if len(inn) != 10:
+        bot.send_message(message.chat.id, 'Ідентифікаційний код має містити 10 цифр. Спробуйте ще')
+        dbworker.set_state(message.chat.id, config.States.S_INN.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET inn='%s' WHERE id='%s'" % (inn, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        # database
+        bot.send_message(message.chat.id, 'Введіть ваш email(сюди буде висланий поліс):')
+        dbworker.set_state(message.chat.id, config.States.S_EMAIL.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_EMAIL.value)
@@ -1314,13 +1318,17 @@ def inn_set(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_INN.value)
 def inn_taking_again(message):
     v = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET inn='%s' WHERE id='%s'" % (v, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    prefinal(message)
+    if len(v) != 10:
+        bot.send_message(message.chat.id, 'Ідентифікаційний код має містити 10 цифр. Спробуйте ще')
+        inn_set(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET inn='%s' WHERE id='%s'" % (v, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        prefinal(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'EMAIL')
