@@ -11,6 +11,13 @@ import random
 
 bot = telebot.TeleBot(config.TOKEN)
 
+def log(message):
+    print("<!------!>")
+    print(datetime.now())
+    print("Сообщение от {0} {1} (id = {2}) \n {3}".format(message.from_user.first_name,
+                                                              message.from_user.last_name,
+                                                              str(message.from_user.id), message.text))
+
 def tariff_parsing(tariff):
     insurer_name = tariff['tariff']['insurer']['namePrint']
     payment = tariff['payment']
@@ -657,6 +664,7 @@ def callback_inline(call):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_CAR_YEAR.value)
 def car_year_taking(message):
+    log(message)
     car_year = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -671,6 +679,7 @@ def car_year_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SURNAME.value)
 def surname_taking(message):
+    log(message)
     surname = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -685,6 +694,7 @@ def surname_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_NAME.value)
 def name_taking(message):
+    log(message)
     name = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -700,6 +710,7 @@ def name_taking(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_PATRONYMIC.value)
 def patronymic_taking(message):
+    log(message)
     patronymic = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -715,6 +726,7 @@ def patronymic_taking(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DATE_OF_BIRTH.value)
 def date_of_birth_taking(message):
+    log(message)
     date_of_birth = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -729,6 +741,7 @@ def date_of_birth_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ADDRESS.value)
 def address_taking(message):
+    log(message)
     address = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -743,6 +756,7 @@ def address_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_INN.value)
 def inn_taking(message):
+    log(message)
     inn = message.text
     if len(inn) != 10:
         bot.send_message(message.chat.id, 'Ідентифікаційний код має містити 10 цифр. Спробуйте ще')
@@ -761,6 +775,7 @@ def inn_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_EMAIL.value)
 def email_taking(message):
+    log(message)
     email = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -775,6 +790,7 @@ def email_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_PHONE.value)
 def phone_taking(message):
+    log(message)
     phone = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -788,6 +804,7 @@ def phone_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SERIES.value)
 def series_taking(message):
+    log(message)
     series = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -805,19 +822,25 @@ def series_taking(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_NUMBER.value)
 def number_taking(message):
+    log(message)
     number = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    bot.send_message(message.chat.id, 'Введіть дату видачі паспорта(в формате ГГГГ-ММ-ДД): ')
-    dbworker.set_state(message.chat.id, config.States.S_DATE.value)
+    if len(number) != 6:
+        bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
+        dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        bot.send_message(message.chat.id, 'Введіть дату видачі паспорта(в формате ГГГГ-ММ-ДД): ')
+        dbworker.set_state(message.chat.id, config.States.S_DATE.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DATE.value)
 def date_taking(message):
+    log(message)
     date = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -832,6 +855,7 @@ def date_taking(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ISSUED_BY.value)
 def issued_taking(message):
+    log(message)
     issued_by = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1207,6 +1231,7 @@ def car_year_set(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_CAR_YEAR.value)
 def car_year_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1225,6 +1250,7 @@ def surname_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_SURNAME.value)
 def surname_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1243,6 +1269,7 @@ def name_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_NAME.value)
 def name_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1262,6 +1289,7 @@ def patronymic_set(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_PATRONYMIC.value)
 def patronymic_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1281,6 +1309,7 @@ def date_set(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_DATE_OF_BIRTH.value)
 def date_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1299,6 +1328,7 @@ def address_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_ADDRESS.value)
 def address_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1317,6 +1347,7 @@ def inn_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_INN.value)
 def inn_taking_again(message):
+    log(message)
     v = message.text
     if len(v) != 10:
         bot.send_message(message.chat.id, 'Ідентифікаційний код має містити 10 цифр. Спробуйте ще')
@@ -1339,6 +1370,7 @@ def email_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_EMAIL.value)
 def email_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1357,6 +1389,7 @@ def phone_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_PHONE.value)
 def phone_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1375,6 +1408,7 @@ def series_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_SERIES.value)
 def series_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1393,14 +1427,19 @@ def number_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_NUMBER.value)
 def number_taking_again(message):
+    log(message)
     v = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (v, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    prefinal(message)
+    if len(v) != 6:
+        bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
+        dbworker.set_state(message.chat.id, config.States.S1_NUMBER.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (v, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        prefinal(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Дата видачі')
@@ -1411,6 +1450,7 @@ def date_set(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_DATE.value)
 def date_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
@@ -1430,6 +1470,7 @@ def issued_set(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S1_ISSUED_BY.value)
 def issued_taking_again(message):
+    log(message)
     v = message.text
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
