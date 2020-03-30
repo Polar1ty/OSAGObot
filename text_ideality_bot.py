@@ -640,15 +640,19 @@ def callback_inline(call):
 def car_year_taking(message):
     log(message)
     car_year = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET car_year='%s' WHERE id='%s'" % (car_year, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    # database
-    bot.send_message(message.chat.id, 'Напишіть ваше прізвище(українською):')
-    dbworker.set_state(message.chat.id, config.States.S_SURNAME.value)
+    if len(car_year) != 4:
+        bot.send_message(message.chat.id, 'Рік випуску має містити 4 цифри. Наприклад 2020. Спробуйте ще.')
+        dbworker.set_state(message.chat.id, config.States.S_CAR_YEAR.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET car_year='%s' WHERE id='%s'" % (car_year, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        # database
+        bot.send_message(message.chat.id, 'Напишіть ваше прізвище(українською):')
+        dbworker.set_state(message.chat.id, config.States.S_SURNAME.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SURNAME.value)
@@ -1199,13 +1203,17 @@ def car_year_set(message):
 def car_year_taking_again(message):
     log(message)
     v = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE user SET car_year='%s' WHERE id='%s'" % (v, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    prefinal(message)
+    if len(v) != 4:
+        bot.send_message(message.chat.id, 'Рік випуску має містити 4 цифри. Наприклад 2020. Спробуйте ще.')
+        car_year_set(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE user SET car_year='%s' WHERE id='%s'" % (v, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        prefinal(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Прізвище')
