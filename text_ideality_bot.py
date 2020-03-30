@@ -207,7 +207,6 @@ def hello(message):
     q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
     results1 = q.fetchone()
     if results1[0] != 1:
-        print('nice')
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
         button1 = types.KeyboardButton('Оформити ОСЦВ 🚗')
         markup.add(button1)
@@ -239,7 +238,8 @@ def hello(message):
             str(message.chat.id) + 'tariff_name': '',
             str(message.chat.id) + 'contract_id': '',
             str(message.chat.id) + 'min_bonus_malus': '',
-            str(message.chat.id) + 'car_year': ''
+            str(message.chat.id) + 'car_year': '',
+            str(message.chat.id) + 'order': ''
         }
     else:
         bot.send_message(message.chat.id, 'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
@@ -267,7 +267,8 @@ def hello(message):
             str(message.chat.id) + 'tariff_name': '',
             str(message.chat.id) + 'contract_id': '',
             str(message.chat.id) + 'min_bonus_malus': '',
-            str(message.chat.id) + 'car_year': ''
+            str(message.chat.id) + 'car_year': '',
+            str(message.chat.id) + 'order': ''
         }
         prefinal(message)
 
@@ -281,10 +282,10 @@ def auto_number(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_NUMBER_CAR.value)
 def asking_city(message):
+    log(message)
     number_car = urllib.parse.quote(message.text)
     url = f'https://web.ewa.ua/ewa/api/v9/auto/mtibu/number?query={number_car}'
     response = requests.get(url, headers=headers, cookies=cookies)
-    print(response.json())
     try:
         model = response.json()[0]['modelText']
         vin_code = str(response.json()[0]['bodyNumber']).upper()
@@ -313,25 +314,11 @@ def asking_city(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_SEARCH_CITY.value)
 def final_city(message):
+    log(message)
     registration_city = urllib.parse.quote(message.text)
     url = f'https://web.ewa.ua/ewa/api/v9/place?country=UA&query={registration_city}'
     city_response = requests.get(url, headers=headers, cookies=cookies)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    print(city_response.json())
-    # for city in city_response.json():
-    #     dictionary = {
-    #         'name_full': city['nameFull'],
-    #         'id': city['id']
-    #     }
-    #     cities.append(dictionary)
-    # utility.update({str(message.chat.id) + 'cities': cities})
-    # cities.clear()
-    # goroda_from_dict = utility.get(str(message.chat.id) + 'cities')
-    # # cities.clear()
-    # print(cities)
-    # for c in cities[0:4]:
-    #     button = types.KeyboardButton(c['name_full'])
-    #     markup.add(button)
     if city_response.json() == []:
         bot.send_message(message.chat.id, 'Таке місто не знайдено. Спробуйте ще раз')
         dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
@@ -399,7 +386,6 @@ def submitting(message):
     connection.close()
     url = f'https://web.ewa.ua/ewa/api/v9/tariff/choose/policy?salePoint={sale_point}&customerCategory={customer_category}&taxi={taxi}&autoCategory={str(results[0][4])}&registrationPlace={id}&outsideUkraine={outside_ua}&registrationType={registration_type}&dateFrom={date_for_req[0]}&dateTo={date_for_req[1]}&usageMonths={usage_mounths}'
     response = requests.get(url, headers=headers, cookies=cookies)
-    print(len(response.json()))
     try:
         tariff1 = tariff_parsing(response.json()[0])
         tariff2 = tariff_parsing(response.json()[1])
@@ -470,18 +456,6 @@ def submitting(message):
                      reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
     except TypeError:
         pass
-    # for tariff in response.json():
-    #     tariffs.append(tariff)
-    #     insurer_name = tariff['tariff']['insurer']['namePrint']
-    #     payment = tariff['payment']
-    #     franchise = tariff['tariff']['franchise']
-    #     id = tariff['tariff']['id']
-    #     markup = types.InlineKeyboardMarkup()
-    #     button = types.InlineKeyboardButton(text='Оформити', callback_data=id)
-    #     markup.add(button)
-    #     bot.send_message(message.chat.id,
-    #                      f'👔Страховик: {insurer_name}\n💵Вартість: {payment}\n💼Франшиза: {franchise}',
-    #                      reply_markup=markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -877,10 +851,8 @@ def prefinal(message):
     q = connection.cursor()
     q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
     results = q.fetchall()
-    print(results)
     q.execute("SELECT * from passport WHERE id='%s'" % message.from_user.id)
     results1 = q.fetchall()
-    print(results1)
     connection.commit()
     q.close()
     connection.close()
@@ -915,8 +887,6 @@ def yes(message):
 
     url = f'https://web.ewa.ua/ewa/api/v9/auto_model/maker_and_model?query={model}'
     response = requests.get(url, headers=headers, cookies=cookies)
-    print(utility.get(str(message.chat.id) + 'tariff_payment'))
-    print(type(utility.get(str(message.chat.id) + 'tariff_payment')))
     try:
         model_id = response.json()[0]['id']
         marka_id = response.json()[0]['autoMaker']['id']
@@ -1036,7 +1006,6 @@ def yes(message):
     r = requests.post(url_for_save_contract, headers=headers, cookies=cookies,
                       data=json_string)  # Перевод договора в состояние ЧЕРНОВИК
     print(r)
-    print(r.json())
     bad_data = 0
     try:
         id_contract = r.json()['id']
@@ -1052,11 +1021,9 @@ def yes(message):
         url_for_req = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/state/REQUEST'
         r1 = requests.post(url_for_req, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАЯВЛЕН
         print(r1)
-        print(r1.json())
         url_for_otp = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/otp/send?customer=true'
         r_otp = requests.get(url_for_otp, headers=headers, cookies=cookies)
         print(r_otp)
-        print(r_otp.json())
         bot.send_message(message.chat.id,
                          'Вам на телефон було відправлено СМС з паролем для укладання договору📲\nВведіть пароль з повідомлення✏')
         dbworker.set_state(message.chat.id, config.States.S_OTP.value)
@@ -1069,7 +1036,6 @@ def otp(message):
     url_otp_2 = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/otp?customer={otp}'
     r_otp_2 = requests.get(url_otp_2, headers=headers, cookies=cookies)
     print(r_otp_2)
-    print(r_otp_2.json())
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
@@ -1161,6 +1127,7 @@ def otp(message):
                      prices=[types.LabeledPrice(label='Полис', amount=amount)],
                      start_parameter='true',
                      photo_url='https://2.bp.blogspot.com/-u0_YERWDpQI/UiD3FMlV1yI/AAAAAAAAHJA/LhZtLmVkTvw/s1600/Mantenimiento.jpg')
+    utility.update({str(message.chat.id) + 'order': order})
 
 
 @bot.pre_checkout_query_handler(func=lambda query: True)
@@ -1176,9 +1143,8 @@ def process_successful_payment(message: types.Message):
     print('Платёж прошел. Всё найс')
     contract = utility.get(str(message.chat.id) + 'contract_id')
     url_for_emi = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/state/EMITTED'
-    rf = requests.post(url_for_emi, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАЯВЛЕН
+    rf = requests.post(url_for_emi, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАКЛЮЧЕН
     print(rf)
-    print(rf.json())
     bot.send_message(message.chat.id,
                      'Платіж пройшов успішно!📠 Незабаром ваш на пошту прийде ваш поліс ОСЦВ📬')
     dbworker.clear_db(message.chat.id)
@@ -1483,20 +1449,12 @@ def issued_taking_again(message):
 
 """
     Баги:
-        слияние сессий
-        реверс списка тарифов
+        Иногда не работает поиск по номеру авто
     Перспективы:
         распознавание документа(тех паспорт авто)
         BankID
-        2 метода оплаты(комп wfp тлф liqpay) потенциально невозможно
         Напоминалка за 2 до конца полиса
-        залить на сервер
         QR - code с Liqpay для оплаты с компа
-    TO DO LIST:
-        1. Докачать базы
-        
-    Cool ideas:
-        Создать двумерный массив который идентифицируется по id чата
 """
 
 # BOT RUNNING
