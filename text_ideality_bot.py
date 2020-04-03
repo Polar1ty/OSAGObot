@@ -11,12 +11,14 @@ import random
 
 bot = telebot.TeleBot(config.TOKEN)
 
+
 def log(message):
     print("<!------!>")
     print(datetime.now())
     print("Сообщение от {0} {1} (id = {2}) \n {3}".format(message.from_user.first_name,
-                                                              message.from_user.last_name,
-                                                              str(message.from_user.id), message.text))
+                                                          message.from_user.last_name,
+                                                          str(message.from_user.id), message.text))
+
 
 def tariff_parsing(tariff):
     insurer_name = tariff['tariff']['insurer']['namePrint']
@@ -40,6 +42,7 @@ def city_into_dict(piece_of_json):
     }
     print(dictionary)
     return dictionary
+
 
 # connection = sql.connect('DATABASE.sqlite')
 # q = connection.cursor()
@@ -78,24 +81,6 @@ def city_into_dict(piece_of_json):
 # q.close()
 # connection.close()
 
-# connection = sql.connect('DATABASE.sqlite')
-# q = connection.cursor()
-# q.execute('''
-# 			CREATE TABLE "utility" (
-# 			    'id' TEXT,
-# 			    'cities' TEXT,
-# 			    'final_city_id' TEXT,
-# 			    'tariffs' TEXT,
-# 			    'tariff_type' TEXT,
-# 			    'tariff_id' TEXT,
-# 			    'tariff_payment' TEXT,
-# 			    'tariff_discounted_payment' TEXT,
-# 			    'tariff_name' TEXT,
-# 			    'contract_ids' TEXT
-# 			)''')
-# connection.commit()
-# q.close()
-# connection.close()
 
 utility = {}
 
@@ -111,7 +96,7 @@ def date_from_to(message):
         day_plus_one = '1'
         month_plus_one = int(date_from_list[0].split('-')[1]) + 1
         date_plus_one_day = date_from_list[0].split('-')[0] + '-' + str(month_plus_one).zfill(2) + '-' + str(
-        day_plus_one).zfill(2)  # Завтрашняя дата
+            day_plus_one).zfill(2)  # Завтрашняя дата
     date_from_ewa = date_plus_one_day + 'T22:00:00.000+0000'  # Дата в формате евы
     date_from_for_req = date_from_ewa.split('T')[0]  # Дата нужна для запрос на поиск полиса ОСАГО
     year_plus_one = int(date_from_ewa.split('-')[0]) + 1
@@ -169,7 +154,7 @@ def reset(message):
         utility.pop(str(message.chat.id) + 'tariff7')
         utility.pop(str(message.chat.id) + 'tariff8')
         bot.send_message(message.chat.id,
-                         '🚀База тимчасових станів очищена.\n Щоб почати оформлення спочатку напишіть /start')
+                         'Тепер все має працювати як слід!\nДля початку роботи натисніть /start')
     except FileNotFoundError:
         utility.pop(str(message.chat.id) + 'city1')
         utility.pop(str(message.chat.id) + 'city2')
@@ -183,10 +168,9 @@ def reset(message):
         utility.pop(str(message.chat.id) + 'tariff6')
         utility.pop(str(message.chat.id) + 'tariff7')
         utility.pop(str(message.chat.id) + 'tariff8')
-        bot.send_message(message.chat.id, 'Ще не було скоєно ніяких дій🧐')
     except KeyError:
         bot.send_message(message.chat.id,
-                         '🚀База тимчасових станів очищена.\n Щоб почати оформлення спочатку напишіть /start')
+                         'Тепер все має працювати як слід!\nДля початку роботи натисніть /start')
 
 
 @bot.message_handler(commands=['help'])
@@ -197,7 +181,7 @@ def help(message):
 @bot.message_handler(commands=['rules'])
 def rules(message):
     bot.send_message(message.chat.id,
-                     '❗Сессія триває 15 хвилин❗\nТобіж у вас є 15 хвилин, щоб ввести всі дані та дійти до оплати.\nУгода (далі - "правила", "угода") ресурсу та бота Zaraz Polis (далі - «Ресурс») Використання інформаційно-аналітичного ресурсу Zaraz Polis Користувачем означає, що Користувач приймає і зобов\'язується дотримуватися всіх нижченаведених умов цієї Угоди. Адміністрація ресурсу залишає за собою право вносити до Угоди зміни, які вступають в силу з моменту публікації. Подальше використання ресурсу після внесення подібних змін означає вашу згоду з ними.\n Повна угода за посиланям - http://zarazpolis.pp.ua/confidentiality.html')
+                     'У вас є 15 хвилин для того, щоби завершити оплату та отримання полісу у форматі PDF, тому радимо одразу мати під рукою усі необхідні документи - свідоцтво про реєстрацію транспортного засобу (техпаспорт), паспорт, id-карту або посвідчення водія.Вводити інформацію слід українською мовою, аби у майбутньому уникнути будь-яких непорозумінь при настанні страхового випадку.Оплата відбувається за допомогою платіжного сервісу Liqpay безпосередньо з мобільної версії Telegram, при використанні desktop-версії оплата наразі не підтримується (у розробці).При виникненні технічних помилок потрібно перезавантажити бота, натиснувши /reset, і почати спочатку.При виникненні питань фінансового характеру зверніться до служби підтримки, натиснувши /help.Договір оферти за посиланням: http://zarazpolis.pp.ua/confidentiality.html')
 
 
 @bot.message_handler(commands=['start'])
@@ -208,10 +192,10 @@ def hello(message):
     results1 = q.fetchone()
     if results1[0] != 1:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        button1 = types.KeyboardButton('Оформити ОСЦВ 🚗')
+        button1 = types.KeyboardButton('ПІДІБРАТИ ПОЛІС🚗')
         markup.add(button1)
         bot.send_message(message.chat.id,
-                         'Добридень {0.first_name}, вас вітає бот для оформлення ОСЦВ - {1.first_name}🚘 \n❗Зауважте, сессія триває 15 хвилин❗'.format(
+                         'Вітаємо, {0.first_name}! Я - бот {1.first_name}, готовий працювати.'.format(
                              message.from_user, bot.get_me()), reply_markup=markup)
         q.execute("INSERT INTO 'user' (id) VALUES ('%s')" % message.from_user.id)
         connection.commit()
@@ -242,7 +226,8 @@ def hello(message):
             str(message.chat.id) + 'order': ''
         }
     else:
-        bot.send_message(message.chat.id, 'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
+        bot.send_message(message.chat.id,
+                         'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
         connection.commit()
         q.close()
         connection.close()
@@ -273,9 +258,9 @@ def hello(message):
         prefinal(message)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Оформити ОСЦВ 🚗')
+@bot.message_handler(func=lambda message: message.text == 'ПІДІБРАТИ ПОЛІС🚗')
 def auto_number(message):
-    bot.send_message(message.chat.id, 'Введіть номерний знак ✍')
+    bot.send_message(message.chat.id, '✍Введіть реєстраційний номер авто (АА0000АА):')
     dbworker.set_state(message.chat.id, config.States.S_NUMBER_CAR.value)
 
 
@@ -293,7 +278,9 @@ def asking_city(message):
         category = response.json()[0]['category']
         if category == 'D1' or category == 'D2':
             bot.send_message(message.chat.id,
-                             'Страховка автобусів не підтримується. Напишіть /reset щоб почати спочатку')
+                             '🚌Страховка автобусів не підтримується.')
+            auto_number(message)
+
         else:
             # запись в базу
             connection = sql.connect('DATABASE.sqlite')
@@ -304,8 +291,8 @@ def asking_city(message):
             q.close()
             connection.close()
             bot.send_message(message.chat.id,
-                             'Модель: {0}\nVIN-код: {1}\nНомерний знак: {2}'.format(model, vin_code, car_nmb))
-            bot.send_message(message.chat.id, 'Введіть місто прописки🏢')
+                             'Модель: {0}\nVIN-код: {1}\nРеєстраційний номер: {2}'.format(model, vin_code, car_nmb))
+            bot.send_message(message.chat.id, '🏢Введіть місце реєстрації авто:')
             dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
     except IndexError:
         bot.send_message(message.chat.id, 'Такого номера не існує. Спробуйте ще раз')
@@ -358,7 +345,7 @@ def final_city(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_REGISTRATION_CITY.value)
 def submitting(message):
-    bot.send_message(message.chat.id, 'Список доступних полісів ОСАЦВ📊⬇')
+    bot.send_message(message.chat.id, '📊⬇Виберіть ваш найкращий варіант:')
     try:
         if message.text == utility.get(str(message.chat.id) + 'city1')['name_full']:
             id = utility.get(str(message.chat.id) + 'city1')['id']
@@ -410,50 +397,50 @@ def submitting(message):
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff8")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff8")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff8")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff8")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff8")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff8")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff8")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff8")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff7")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff7")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff7")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff7")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff7")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff7")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff7")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff7")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff6")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff6")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff6")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff6")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff6")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff6")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff6")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff6")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff5")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff5")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff5")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff5")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff5")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff5")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff5")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff5")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff4")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff4")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff4")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff4")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff4")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff4")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff4")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff4")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff3")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff3")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff3")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff3")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff3")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff3")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff3")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff3")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {utility.get(str(message.chat.id) + "tariff2")[0]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff2")[1]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff2")[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff2")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff2")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff2")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff2")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff2")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                     f'👔Страховик: {(utility.get(str(message.chat.id) + "tariff1"))[0]}\n💵Вартість: {(utility.get(str(message.chat.id) + "tariff1"))[1]}\n💼Франшиза: {(utility.get(str(message.chat.id) + "tariff1"))[2]}',
-                     reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff1")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff1")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff1")[1]}',
+                         reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
     except TypeError:
         pass
 
@@ -462,7 +449,8 @@ def submitting(message):
 def callback_inline(call):
     try:
         print(call.data, type(call.data))
-        print(utility.get(str(call.message.chat.id) + 'tariff1')[3], type(utility.get(str(call.message.chat.id) + 'tariff1')[3]))
+        print(utility.get(str(call.message.chat.id) + 'tariff1')[3],
+              type(utility.get(str(call.message.chat.id) + 'tariff1')[3]))
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff1')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff1")[3]})
@@ -471,17 +459,18 @@ def callback_inline(call):
             utility.update(
                 {str(call.message.chat.id) + 'tariff_payment': utility.get(str(call.message.chat.id) + "tariff1")[1]})
             utility.update(
-                {str(call.message.chat.id) + 'tariff_discounted_payment': utility.get(str(call.message.chat.id) + "tariff1")[6]})
+                {str(call.message.chat.id) + 'tariff_discounted_payment':
+                     utility.get(str(call.message.chat.id) + "tariff1")[6]})
             utility.update(
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff1")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff1")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                             'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff2')[3]:
             utility.update(
@@ -497,12 +486,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff2")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff2")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff3')[3]:
             utility.update(
@@ -518,12 +507,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff3")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff3")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff4')[3]:
             utility.update(
@@ -539,12 +528,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff4")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff4")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff5')[3]:
             utility.update(
@@ -560,12 +549,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff5")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff5")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff6')[3]:
             utility.update(
@@ -581,12 +570,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff6")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff6")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff7')[3]:
             utility.update(
@@ -602,12 +591,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff7")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff7")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff8')[3]:
             utility.update(
@@ -623,12 +612,12 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'tariff_name': utility.get(str(call.message.chat.id) + "tariff8")[0]})
             utility.update(
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff8")[7]})
-            if utility.get(str(call.message.chat.id) + 'car_year') == None:
+            if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Відмінно! Теперь введіть будь ласка рік випуску вашого авто(пункт B.2 тех паспорта)↘')
+                                 'Добре!👍 Введіть рік випуску автомобіля (пункт B.2 свідоцтва про реєстрацію ТЗ)')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Напишіть ваше прізвище(українською):')
+                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
                 dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
     except IndexError:
         pass
@@ -666,7 +655,7 @@ def surname_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, "Напишіть ваше ім'я (українською):")
+    bot.send_message(message.chat.id, "Введіть своє ім'я (українською):")
     dbworker.set_state(message.chat.id, config.States.S_NAME.value)
 
 
@@ -681,7 +670,7 @@ def name_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Як вас звати по-батькові?(українською):')
+    bot.send_message(message.chat.id, 'Введіть своє по-батькові (українською):')
     dbworker.set_state(message.chat.id, config.States.S_PATRONYMIC.value)
 
 
@@ -697,7 +686,7 @@ def patronymic_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Напишіть дату вашого народження(в форматі РРРР-ММ-ДД):')
+    bot.send_message(message.chat.id, 'Введіть дату свого народження (у форматі РРРР-ММ-ДД):')
     dbworker.set_state(message.chat.id, config.States.S_DATE_OF_BIRTH.value)
 
 
@@ -713,7 +702,7 @@ def date_of_birth_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Напишіть адресу вашої прописки (в форматі:Місто,Вулиця,Дім,Квартира):')
+    bot.send_message(message.chat.id, 'Введіть адресу своєї реєстрації (у форматі: місто, вулиця, дім, квартира):')
     dbworker.set_state(message.chat.id, config.States.S_ADDRESS.value)
 
 
@@ -728,7 +717,7 @@ def address_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть ваш ІНН(10 цифр):')
+    bot.send_message(message.chat.id, 'Введіть свій ІНПП (10 цифр):')
     dbworker.set_state(message.chat.id, config.States.S_INN.value)
 
 
@@ -747,7 +736,7 @@ def inn_taking(message):
         q.close()
         connection.close()
         # database
-        bot.send_message(message.chat.id, 'Введіть ваш email(сюди буде висланий поліс):')
+        bot.send_message(message.chat.id, 'Введіть email, на який ви бажаєте отримати електронний поліс:')
         dbworker.set_state(message.chat.id, config.States.S_EMAIL.value)
 
 
@@ -762,7 +751,7 @@ def email_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть ваш мобільний номер телефону(повинен починатися на +380):')
+    bot.send_message(message.chat.id, 'Введіть номер мобільного телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):')
     dbworker.set_state(message.chat.id, config.States.S_PHONE.value)
 
 
@@ -776,7 +765,7 @@ def phone_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть серію паспорта: ')
+    bot.send_message(message.chat.id, 'Введіть серію паспорта (2 літери):')
     dbworker.set_state(message.chat.id, config.States.S_SERIES.value)
 
 
@@ -794,7 +783,7 @@ def series_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть номер паспорта: ')
+    bot.send_message(message.chat.id, 'Введіть номер паспорта (6 цифр):')
     dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
 
 
@@ -812,7 +801,7 @@ def number_taking(message):
         connection.commit()
         q.close()
         connection.close()
-        bot.send_message(message.chat.id, 'Введіть дату видачі паспорта(в формате ГГГГ-ММ-ДД): ')
+        bot.send_message(message.chat.id, 'Введіть дату видачі паспорта (у форматі РРРР-ММ-ДД):')
         dbworker.set_state(message.chat.id, config.States.S_DATE.value)
 
 
@@ -826,7 +815,7 @@ def date_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть орган видачі паспорта: ')
+    bot.send_message(message.chat.id, 'Введіть орган, що видав паспорт:')
     dbworker.set_state(message.chat.id, config.States.S_ISSUED_BY.value)
 
 
@@ -850,7 +839,7 @@ def prefinal(message):
     button2 = types.KeyboardButton('Змінити✖')
     button3 = types.KeyboardButton('Спочатку🔄')
     markup.add(button1, button2, button3)
-    bot.send_message(message.chat.id, 'Підтвердіть правильність введених данних')
+    bot.send_message(message.chat.id, 'Перевірте правильність введених даних.')
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
@@ -861,7 +850,7 @@ def prefinal(message):
     q.close()
     connection.close()
     bot.send_message(message.chat.id,
-                     f"Інформація про авто🚗⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nНомер машини:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nОсобиста інформація🤵⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса прописки:  {results[0][10]}\nІНН:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nПаспортні дані📖⬇\n\nСерія паспорта:  {results1[0][1]}\nНомер паспорта:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган видачі:  {results1[0][4]}",
+                     f"Дані автомобіля🚗⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація🤵⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖⬇\n\nСерія паспорта:  {results1[0][1]}\nНомер паспорта:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
                      reply_markup=markup)
     dbworker.clear_db(message.chat.id)
 
@@ -1029,7 +1018,7 @@ def yes(message):
         r_otp = requests.get(url_for_otp, headers=headers, cookies=cookies)
         print(r_otp)
         bot.send_message(message.chat.id,
-                         'Вам на телефон було відправлено СМС з паролем для укладання договору📲\nВведіть пароль з повідомлення✏')
+                         '📲На ваш мобільний телефон було відправлено СМС з паролем для підпису електронного полісу.Введіть, будь-ласка, пароль з повідомлення')
         dbworker.set_state(message.chat.id, config.States.S_OTP.value)
 
 
@@ -1150,7 +1139,7 @@ def process_successful_payment(message: types.Message):
     rf = requests.post(url_for_emi, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАКЛЮЧЕН
     print(rf)
     bot.send_message(message.chat.id,
-                     'Платіж пройшов успішно!📠 Незабаром ваш на пошту прийде ваш поліс ОСЦВ📬')
+                     'Платіж пройшов успішно!📠 Перевірте пошту, яку вказували при оформленні - ваш електронний поліс у форматі PDF має бути там📬Дякуємо за співпрацю! До зустрічі через рік (а можливо і раніше).Якщо ви задоволені моєю роботою - поділіться мною, будь-ласка, з другом - https://t.me/osago_insurance_bot.')
     dbworker.clear_db(message.chat.id)
     try:
         utility.pop(str(message.chat.id) + 'city1')
@@ -1170,7 +1159,6 @@ def process_successful_payment(message: types.Message):
         pass
 
 
-
 @bot.message_handler(func=lambda message: message.text == 'Змінити✖')
 def no(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -1180,7 +1168,7 @@ def no(message):
     button4 = types.KeyboardButton('По-батькові')
     button5 = types.KeyboardButton('Дата нарождения')
     button6 = types.KeyboardButton('Адреса прописки')
-    button7 = types.KeyboardButton('ІНН')
+    button7 = types.KeyboardButton('ІНПП')
     button8 = types.KeyboardButton('EMAIL')
     button9 = types.KeyboardButton('Телефон')
     button10 = types.KeyboardButton('Серія паспорта')
@@ -1313,9 +1301,9 @@ def address_taking_again(message):
     prefinal(message)
 
 
-@bot.message_handler(func=lambda message: message.text == 'ІНН')
+@bot.message_handler(func=lambda message: message.text == 'ІНПП')
 def inn_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваш ІНН(10 цифр):')
+    bot.send_message(message.chat.id, 'Введіть ваш ІНПП(10 цифр):')
     dbworker.set_state(message.chat.id, config.States.S1_INN.value)
 
 
