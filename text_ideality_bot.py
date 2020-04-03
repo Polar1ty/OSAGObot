@@ -116,8 +116,6 @@ data = {
     'password': config.password  # hashed
 }
 response = requests.post('https://web.ewa.ua/ewa/api/v9/user/login', headers=headers, data=data)
-# 'https://web.ewa.ua/ewa/api/v9/tariff/choose/policy?salePoint=32070&customerCategory=NATURAL&taxi=false&autoCategory=B1&registrationPlace=7&outsideUkraine=false&registrationType=PERMANENT_WITHOUT_OTK&dateFrom=2019-12-01&dateTo=2020-11-30&usageMonths=0
-#                                                        salePoint        customerCategory         taxi          category            id                 outside_ua        registration_type                date_from_req_      date_to_req      usage_months
 cookie = response.json()['sessionId']
 sale_point = response.json()['user']['salePoint']['id']
 user = response.json()['user']['id']
@@ -397,49 +395,49 @@ def submitting(message):
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff8")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff8")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff8")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff8")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff8")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff8")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff8")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff7")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff7")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff7")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff7")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff7")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff7")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff7")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff6")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff6")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff6")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff6")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff6")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff6")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff6")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff5")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff5")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff5")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff5")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff5")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff5")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff5")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff4")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff4")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff4")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff4")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff4")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff4")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff4")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff3")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff3")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff3")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff3")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff3")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff3")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff3")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff2")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff2")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff2")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff2")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff2")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff2")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff2")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff1")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff1")[2]}\n💵Вартість: {utility.get(str(message.chat.id) + "tariff1")[1]}',
+                         f'👔Страховик: {utility.get(str(message.chat.id) + "tariff1")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff1")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff1")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
     except TypeError:
         pass
@@ -640,7 +638,7 @@ def car_year_taking(message):
         q.close()
         connection.close()
         # database
-        bot.send_message(message.chat.id, 'Напишіть ваше прізвище(українською):')
+        bot.send_message(message.chat.id, '✍Напишіть ваше прізвище(українською):')
         dbworker.set_state(message.chat.id, config.States.S_SURNAME.value)
 
 
@@ -655,7 +653,7 @@ def surname_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, "Введіть своє ім'я (українською):")
+    bot.send_message(message.chat.id, "✍Введіть своє ім'я (українською):")
     dbworker.set_state(message.chat.id, config.States.S_NAME.value)
 
 
@@ -670,7 +668,7 @@ def name_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть своє по-батькові (українською):')
+    bot.send_message(message.chat.id, '✍Введіть своє по-батькові (українською):')
     dbworker.set_state(message.chat.id, config.States.S_PATRONYMIC.value)
 
 
@@ -686,7 +684,7 @@ def patronymic_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть дату свого народження (у форматі РРРР-ММ-ДД):')
+    bot.send_message(message.chat.id, '✍Введіть дату свого народження (у форматі РРРР-ММ-ДД):')
     dbworker.set_state(message.chat.id, config.States.S_DATE_OF_BIRTH.value)
 
 
@@ -702,7 +700,7 @@ def date_of_birth_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть адресу своєї реєстрації (у форматі: місто, вулиця, дім, квартира):')
+    bot.send_message(message.chat.id, '✍Введіть адресу своєї реєстрації (у форматі: місто, вулиця, дім, квартира):')
     dbworker.set_state(message.chat.id, config.States.S_ADDRESS.value)
 
 
@@ -717,7 +715,7 @@ def address_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть свій ІНПП (10 цифр):')
+    bot.send_message(message.chat.id, '✍Введіть свій ІНПП (10 цифр):')
     dbworker.set_state(message.chat.id, config.States.S_INN.value)
 
 
@@ -736,7 +734,7 @@ def inn_taking(message):
         q.close()
         connection.close()
         # database
-        bot.send_message(message.chat.id, 'Введіть email, на який ви бажаєте отримати електронний поліс:')
+        bot.send_message(message.chat.id, '✍Введіть email, на який ви бажаєте отримати електронний поліс:')
         dbworker.set_state(message.chat.id, config.States.S_EMAIL.value)
 
 
@@ -751,7 +749,7 @@ def email_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть номер мобільного телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):')
+    bot.send_message(message.chat.id, '✍Введіть номер мобільного телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):')
     dbworker.set_state(message.chat.id, config.States.S_PHONE.value)
 
 
@@ -765,7 +763,7 @@ def phone_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть серію паспорта (2 літери):')
+    bot.send_message(message.chat.id, '✍Введіть серію паспорта (2 літери):')
     dbworker.set_state(message.chat.id, config.States.S_SERIES.value)
 
 
@@ -783,7 +781,7 @@ def series_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть номер паспорта (6 цифр):')
+    bot.send_message(message.chat.id, '✍Введіть номер паспорта (6 цифр):')
     dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
 
 
@@ -801,7 +799,7 @@ def number_taking(message):
         connection.commit()
         q.close()
         connection.close()
-        bot.send_message(message.chat.id, 'Введіть дату видачі паспорта (у форматі РРРР-ММ-ДД):')
+        bot.send_message(message.chat.id, '✍Введіть дату видачі паспорта (у форматі РРРР-ММ-ДД):')
         dbworker.set_state(message.chat.id, config.States.S_DATE.value)
 
 
@@ -815,7 +813,7 @@ def date_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть орган, що видав паспорт:')
+    bot.send_message(message.chat.id, '✍Введіть орган, що видав паспорт:')
     dbworker.set_state(message.chat.id, config.States.S_ISSUED_BY.value)
 
 
@@ -1182,7 +1180,7 @@ def no(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Рік випуску')
 def car_year_set(message):
-    bot.send_message(message.chat.id, 'Введіть рік випуску:')
+    bot.send_message(message.chat.id, '✍Введіть рік випуску:')
     dbworker.set_state(message.chat.id, config.States.S1_CAR_YEAR.value)
 
 
@@ -1206,7 +1204,7 @@ def car_year_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Прізвище')
 def surname_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваше прізвище(українською):')
+    bot.send_message(message.chat.id, '✍Введіть ваше прізвище(українською):')
     dbworker.set_state(message.chat.id, config.States.S1_SURNAME.value)
 
 
@@ -1225,7 +1223,7 @@ def surname_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == "І'мя")
 def name_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваше імя(українською):')
+    bot.send_message(message.chat.id, '✍Введіть ваше імя(українською):')
     dbworker.set_state(message.chat.id, config.States.S1_NAME.value)
 
 
@@ -1244,7 +1242,7 @@ def name_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'По-батькові')
 def patronymic_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваше імя по батькові(українською):')
+    bot.send_message(message.chat.id, '✍Введіть ваше імя по батькові(українською):')
     dbworker.set_state(message.chat.id, config.States.S1_PATRONYMIC.value)
 
 
@@ -1264,7 +1262,7 @@ def patronymic_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Дата нарождения')
 def date_set(message):
-    bot.send_message(message.chat.id, 'Введіть вашу дату нарождения(в форматі РРРР-ММ-ДД):')
+    bot.send_message(message.chat.id, '✍Введіть вашу дату нарождения(в форматі РРРР-ММ-ДД):')
     dbworker.set_state(message.chat.id, config.States.S1_DATE_OF_BIRTH.value)
 
 
@@ -1284,7 +1282,7 @@ def date_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Адреса прописки')
 def address_set(message):
-    bot.send_message(message.chat.id, 'Введіть вашу адресу прописки(в форматі "Місто,Вулиця,Дім,Квартира"):')
+    bot.send_message(message.chat.id, '✍Введіть вашу адресу прописки(в форматі "Місто,Вулиця,Дім,Квартира"):')
     dbworker.set_state(message.chat.id, config.States.S1_ADDRESS.value)
 
 
@@ -1303,7 +1301,7 @@ def address_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'ІНПП')
 def inn_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваш ІНПП(10 цифр):')
+    bot.send_message(message.chat.id, '✍Введіть ваш ІНПП(10 цифр):')
     dbworker.set_state(message.chat.id, config.States.S1_INN.value)
 
 
@@ -1326,7 +1324,7 @@ def inn_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'EMAIL')
 def email_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваш email(сюди буде висланий поліс):')
+    bot.send_message(message.chat.id, '✍Введіть ваш email(сюди буде висланий поліс):')
     dbworker.set_state(message.chat.id, config.States.S1_EMAIL.value)
 
 
@@ -1345,7 +1343,7 @@ def email_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Телефон')
 def phone_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваш  моібльний номер телефону:')
+    bot.send_message(message.chat.id, '✍Введіть ваш  моібльний номер телефону:')
     dbworker.set_state(message.chat.id, config.States.S1_PHONE.value)
 
 
@@ -1364,7 +1362,7 @@ def phone_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Серія паспорта')
 def series_set(message):
-    bot.send_message(message.chat.id, 'Введіть вашу серію паспорта:')
+    bot.send_message(message.chat.id, '✍Введіть вашу серію паспорта:')
     dbworker.set_state(message.chat.id, config.States.S1_SERIES.value)
 
 
@@ -1383,7 +1381,7 @@ def series_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Номер паспорта')
 def number_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваш номер паспорта:')
+    bot.send_message(message.chat.id, '✍Введіть ваш номер паспорта:')
     dbworker.set_state(message.chat.id, config.States.S1_NUMBER.value)
 
 
@@ -1406,7 +1404,7 @@ def number_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Дата видачі')
 def date_set(message):
-    bot.send_message(message.chat.id, 'Введіть дату видачі паспорта(в форматі РРРР-ММ-ДД):')
+    bot.send_message(message.chat.id, '✍Введіть дату видачі паспорта(в форматі РРРР-ММ-ДД):')
     dbworker.set_state(message.chat.id, config.States.S1_DATE.value)
 
 
@@ -1425,7 +1423,7 @@ def date_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Орган видачі')
 def issued_set(message):
-    bot.send_message(message.chat.id, 'Введіть орган видачі паспорта:')
+    bot.send_message(message.chat.id, '✍Введіть орган видачі паспорта:')
     dbworker.set_state(message.chat.id, config.States.S1_ISSUED_BY.value)
 
 
