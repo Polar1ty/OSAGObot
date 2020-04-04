@@ -218,6 +218,7 @@ def hello(message):
             str(message.chat.id) + 'tariff_payment': '',
             str(message.chat.id) + 'tariff_discounted_payment': '',
             str(message.chat.id) + 'tariff_name': '',
+            str(message.chat.id) + 'doc_type': '',
             str(message.chat.id) + 'contract_id': '',
             str(message.chat.id) + 'min_bonus_malus': '',
             str(message.chat.id) + 'car_year': '',
@@ -248,6 +249,7 @@ def hello(message):
             str(message.chat.id) + 'tariff_payment': '',
             str(message.chat.id) + 'tariff_discounted_payment': '',
             str(message.chat.id) + 'tariff_name': '',
+            str(message.chat.id) + 'doc_type': '',
             str(message.chat.id) + 'contract_id': '',
             str(message.chat.id) + 'min_bonus_malus': '',
             str(message.chat.id) + 'car_year': '',
@@ -778,6 +780,7 @@ def phone_taking(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Паспорт 📖')
 def passport(message):
+    utility.update({str(message.chat.id) + 'doc_type': 'PASSPORT'})
     bot.send_message(message.chat.id, 'Введіть серію паспорта (2 літери):✍')
     dbworker.set_state(message.chat.id, config.States.S_SERIES.value)
 
@@ -850,7 +853,8 @@ def issued_taking(message):
 
 @bot.message_handler(func=lambda message: message.text == 'ID-карта')
 def id_card(message):
-    bot.send_message(message.chat.id, 'Введіть номер ID-карти:✍')
+    utility.update({str(message.chat.id) + 'doc_type': 'ID_PASSPORT'})
+    bot.send_message(message.chat.id, 'Введіть запис ID карти:✍')
     dbworker.set_state(message.chat.id, config.States.S_ID_SERIES.value)
 
 
@@ -868,7 +872,7 @@ def series_id_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть запис ID карти:✍')
+    bot.send_message(message.chat.id, 'Введіть номер ID-карти:✍')
     dbworker.set_state(message.chat.id, config.States.S_ID_NUMBER.value)
 
 
@@ -921,7 +925,8 @@ def issued_id_taking(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Посвідчення водія 🚘')
 def driver_license(message):
-    bot.send_message(message.chat.id, 'Введіть серію посвідчення (2 літери):✍')
+    utility.update({str(message.chat.id) + 'doc_type': 'DRIVING_LICENSE'})
+    bot.send_message(message.chat.id, 'Введіть серію посвідчення:✍')
     dbworker.set_state(message.chat.id, config.States.S_DRIVER_SERIES.value)
 
 
@@ -1006,7 +1011,7 @@ def prefinal(message):
     q.close()
     connection.close()
     bot.send_message(message.chat.id,
-                     f"Дані автомобіля🚘⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація😉⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖⬇\n\nСерія паспорта:  {results1[0][1]}\nНомер паспорта:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
+                     f"Дані автомобіля🚘⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація😉⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖⬇\n\nСерія/Запис документа:  {results1[0][1]}\nНомер документа:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
                      reply_markup=markup)
     dbworker.clear_db(message.chat.id)
 
@@ -1036,125 +1041,236 @@ def yes(message):
 
     url = f'https://web.ewa.ua/ewa/api/v9/auto_model/maker_and_model?query={model}'
     response = requests.get(url, headers=headers, cookies=cookies)
-    try:
-        model_id = response.json()[0]['id']
-        marka_id = response.json()[0]['autoMaker']['id']
-        modelText = results[0][1]
-        contract_data = {
-            'type': 'epolicy',
-            'salePoint': {'id': sale_point,
-                          'company': {
-                              'type': company_type,
-                              'id': company_id
-                          }},
-            'user': {'id': user},
-            'payment': str(utility.get(str(message.chat.id) + 'tariff_payment')),
-            'brokerDiscountedPayment': str(utility.get(str(message.chat.id) + 'tariff_discounted_payment')),
-            'tariff': {
-                'type': str(utility.get(str(message.chat.id) + 'tariff_type')),
-                'id': str(utility.get(str(message.chat.id) + 'tariff_id'))
-            },
-            'date': datetime.fromtimestamp(int(message.date)).strftime('%Y-%m-%d'),
-            'dateFrom': d[2],
-            'customer': {
-                'code': results[0][11],
-                'nameLast': results[0][7],
-                'nameFirst': results[0][6],
-                'nameMiddle': results[0][8],
-                'address': results[0][10],
-                'phone': results[0][13],
-                'email': results[0][12],
-                'birthDate': results[0][9],
-                'document': {
-                    'type': 'PASSPORT',
-                    'series': results1[0][1],
-                    'number': results1[0][2],
-                    'date': results1[0][3],
-                    'issuedBy': results1[0][4]
-                }
-            },
-            'insuranceObject': {
-                'type': 'auto',
-                'category': results[0][4],
-                'model': {
-                    'id': model_id,
-                    'autoMaker': {
-                        'id': marka_id
+    if str(utility.get(str(message.chat.id) + 'doc_type')) == 'ID_PASSPORT':
+        try:
+            model_id = response.json()[0]['id']
+            marka_id = response.json()[0]['autoMaker']['id']
+            modelText = results[0][1]
+            contract_data = {
+                'type': 'epolicy',
+                'salePoint': {'id': sale_point,
+                              'company': {
+                                  'type': company_type,
+                                  'id': company_id
+                              }},
+                'user': {'id': user},
+                'payment': str(utility.get(str(message.chat.id) + 'tariff_payment')),
+                'brokerDiscountedPayment': str(utility.get(str(message.chat.id) + 'tariff_discounted_payment')),
+                'tariff': {
+                    'type': str(utility.get(str(message.chat.id) + 'tariff_type')),
+                    'id': str(utility.get(str(message.chat.id) + 'tariff_id'))
+                },
+                'date': datetime.fromtimestamp(int(message.date)).strftime('%Y-%m-%d'),
+                'dateFrom': d[2],
+                'customer': {
+                    'code': results[0][11],
+                    'nameLast': results[0][7],
+                    'nameFirst': results[0][6],
+                    'nameMiddle': results[0][8],
+                    'address': results[0][10],
+                    'phone': results[0][13],
+                    'email': results[0][12],
+                    'birthDate': results[0][9],
+                    'document': {
+                        'type': str(utility.get(str(message.chat.id) + 'doc_type')),
+                        'record': results1[0][1],
+                        'number': results1[0][2],
+                        'date': results1[0][3],
+                        'issuedBy': results1[0][4]
                     }
                 },
-                'modelText': modelText,
-                'bodyNumber': results[0][2],
-                'stateNumber': str(results[0][3]).upper(),
-                'registrationPlace': {
-                    'id': str(utility.get(str(message.chat.id) + 'final_city_id')),
+                'insuranceObject': {
+                    'type': 'auto',
+                    'category': results[0][4],
+                    'model': {
+                        'id': model_id,
+                        'autoMaker': {
+                            'id': marka_id
+                        }
+                    },
+                    'modelText': modelText,
+                    'bodyNumber': results[0][2],
+                    'stateNumber': str(results[0][3]).upper(),
+                    'registrationPlace': {
+                        'id': str(utility.get(str(message.chat.id) + 'final_city_id')),
+                    },
+                    'registrationType': registration_type,  # нужно где-то брать
+                    'year': results[0][5],
                 },
-                'registrationType': registration_type,  # нужно где-то брать
-                'year': results[0][5],
-            },
-            'state': 'DRAFT',
-            'bonusMalus': utility.get(str(message.chat.id) + 'min_bonus_malus')
-        }
-        print(model_id, marka_id)
-        print(contract_data['date'])
-        print(contract_data['dateFrom'])
-    except IndexError:
-        modelText = results[0][1]
-        contract_data = {
-            'type': 'epolicy',
-            'salePoint': {'id': sale_point,
-                          'company': {
-                              'type': company_type,
-                              'id': company_id
-                          }},
-            'user': {'id': user},
-            'payment': str(utility.get(str(message.chat.id) + 'tariff_payment')),
-            'brokerDiscountedPayment': str(utility.get(str(message.chat.id) + 'tariff_discounted_payment')),
-            'tariff': {
-                'type': str(utility.get(str(message.chat.id) + 'tariff_type')),
-                'id': str(utility.get(str(message.chat.id) + 'tariff_id'))
-            },
-            'date': datetime.fromtimestamp(int(message.date)).strftime('%Y-%m-%d'),
-            'dateFrom': d[2],
-            'customer': {
-                'code': results[0][11],
-                'nameLast': results[0][7],
-                'nameFirst': results[0][6],
-                'nameMiddle': results[0][8],
-                'address': results[0][10],
-                'phone': results[0][13],
-                'email': results[0][12],
-                'birthDate': results[0][9],
-                'document': {
-                    'type': 'PASSPORT',
-                    'series': results1[0][1],
-                    'number': results1[0][2],
-                    'date': results1[0][3],
-                    'issuedBy': results1[0][4]
-                }
-            },
-            'insuranceObject': {
-                'type': 'auto',
-                'category': results[0][4],
-                'modelText': modelText,
-                'bodyNumber': results[0][2],
-                'stateNumber': str(results[0][3]).upper(),
-                'registrationPlace': {
-                    'id': utility.get(str(message.chat.id) + 'final_city_id'),
+                'state': 'DRAFT',
+                'bonusMalus': utility.get(str(message.chat.id) + 'min_bonus_malus')
+            }
+            print(model_id, marka_id)
+        except IndexError:
+            modelText = results[0][1]
+            contract_data = {
+                'type': 'epolicy',
+                'salePoint': {'id': sale_point,
+                              'company': {
+                                  'type': company_type,
+                                  'id': company_id
+                              }},
+                'user': {'id': user},
+                'payment': str(utility.get(str(message.chat.id) + 'tariff_payment')),
+                'brokerDiscountedPayment': str(utility.get(str(message.chat.id) + 'tariff_discounted_payment')),
+                'tariff': {
+                    'type': str(utility.get(str(message.chat.id) + 'tariff_type')),
+                    'id': str(utility.get(str(message.chat.id) + 'tariff_id'))
                 },
-                'registrationType': registration_type,  # нужно где-то брать
-                'year': results[0][5],
-            },
-            'state': 'DRAFT',
-            'bonusMalus': utility.get(str(message.chat.id) + 'min_bonus_malus')
-        }
-        print(f"Нету информации о машине {modelText}")
-        print(contract_data['date'])
-        print(contract_data['dateFrom'])
+                'date': datetime.fromtimestamp(int(message.date)).strftime('%Y-%m-%d'),
+                'dateFrom': d[2],
+                'customer': {
+                    'code': results[0][11],
+                    'nameLast': results[0][7],
+                    'nameFirst': results[0][6],
+                    'nameMiddle': results[0][8],
+                    'address': results[0][10],
+                    'phone': results[0][13],
+                    'email': results[0][12],
+                    'birthDate': results[0][9],
+                    'document': {
+                        'type': str(utility.get(str(message.chat.id) + 'doc_type')),
+                        'record': results1[0][1],
+                        'number': results1[0][2],
+                        'date': results1[0][3],
+                        'issuedBy': results1[0][4]
+                    }
+                },
+                'insuranceObject': {
+                    'type': 'auto',
+                    'category': results[0][4],
+                    'modelText': modelText,
+                    'bodyNumber': results[0][2],
+                    'stateNumber': str(results[0][3]).upper(),
+                    'registrationPlace': {
+                        'id': utility.get(str(message.chat.id) + 'final_city_id'),
+                    },
+                    'registrationType': registration_type,  # нужно где-то брать
+                    'year': results[0][5],
+                },
+                'state': 'DRAFT',
+                'bonusMalus': utility.get(str(message.chat.id) + 'min_bonus_malus')
+            }
+            print(f"Нету информации о машине {modelText}")
+    else:
+        try:
+            model_id = response.json()[0]['id']
+            marka_id = response.json()[0]['autoMaker']['id']
+            modelText = results[0][1]
+            contract_data = {
+                'type': 'epolicy',
+                'salePoint': {'id': sale_point,
+                              'company': {
+                                  'type': company_type,
+                                  'id': company_id
+                              }},
+                'user': {'id': user},
+                'payment': str(utility.get(str(message.chat.id) + 'tariff_payment')),
+                'brokerDiscountedPayment': str(utility.get(str(message.chat.id) + 'tariff_discounted_payment')),
+                'tariff': {
+                    'type': str(utility.get(str(message.chat.id) + 'tariff_type')),
+                    'id': str(utility.get(str(message.chat.id) + 'tariff_id'))
+                },
+                'date': datetime.fromtimestamp(int(message.date)).strftime('%Y-%m-%d'),
+                'dateFrom': d[2],
+                'customer': {
+                    'code': results[0][11],
+                    'nameLast': results[0][7],
+                    'nameFirst': results[0][6],
+                    'nameMiddle': results[0][8],
+                    'address': results[0][10],
+                    'phone': results[0][13],
+                    'email': results[0][12],
+                    'birthDate': results[0][9],
+                    'document': {
+                        'type': str(utility.get(str(message.chat.id) + 'doc_type')),
+                        'series': results1[0][1],
+                        'number': results1[0][2],
+                        'date': results1[0][3],
+                        'issuedBy': results1[0][4]
+                    }
+                },
+                'insuranceObject': {
+                    'type': 'auto',
+                    'category': results[0][4],
+                    'model': {
+                        'id': model_id,
+                        'autoMaker': {
+                            'id': marka_id
+                        }
+                    },
+                    'modelText': modelText,
+                    'bodyNumber': results[0][2],
+                    'stateNumber': str(results[0][3]).upper(),
+                    'registrationPlace': {
+                        'id': str(utility.get(str(message.chat.id) + 'final_city_id')),
+                    },
+                    'registrationType': registration_type,  # нужно где-то брать
+                    'year': results[0][5],
+                },
+                'state': 'DRAFT',
+                'bonusMalus': utility.get(str(message.chat.id) + 'min_bonus_malus')
+            }
+            print(model_id, marka_id)
+        except IndexError:
+            modelText = results[0][1]
+            contract_data = {
+                'type': 'epolicy',
+                'salePoint': {'id': sale_point,
+                              'company': {
+                                  'type': company_type,
+                                  'id': company_id
+                              }},
+                'user': {'id': user},
+                'payment': str(utility.get(str(message.chat.id) + 'tariff_payment')),
+                'brokerDiscountedPayment': str(utility.get(str(message.chat.id) + 'tariff_discounted_payment')),
+                'tariff': {
+                    'type': str(utility.get(str(message.chat.id) + 'tariff_type')),
+                    'id': str(utility.get(str(message.chat.id) + 'tariff_id'))
+                },
+                'date': datetime.fromtimestamp(int(message.date)).strftime('%Y-%m-%d'),
+                'dateFrom': d[2],
+                'customer': {
+                    'code': results[0][11],
+                    'nameLast': results[0][7],
+                    'nameFirst': results[0][6],
+                    'nameMiddle': results[0][8],
+                    'address': results[0][10],
+                    'phone': results[0][13],
+                    'email': results[0][12],
+                    'birthDate': results[0][9],
+                    'document': {
+                        'type': str(utility.get(str(message.chat.id) + 'doc_type')),
+                        'series': results1[0][1],
+                        'number': results1[0][2],
+                        'date': results1[0][3],
+                        'issuedBy': results1[0][4]
+                    }
+                },
+                'insuranceObject': {
+                    'type': 'auto',
+                    'category': results[0][4],
+                    'modelText': modelText,
+                    'bodyNumber': results[0][2],
+                    'stateNumber': str(results[0][3]).upper(),
+                    'registrationPlace': {
+                        'id': utility.get(str(message.chat.id) + 'final_city_id'),
+                    },
+                    'registrationType': registration_type,  # нужно где-то брать
+                    'year': results[0][5],
+                },
+                'state': 'DRAFT',
+                'bonusMalus': utility.get(str(message.chat.id) + 'min_bonus_malus')
+            }
+            print(f"Нету информации о машине {modelText}")
+    print(str(utility.get(str(message.chat.id) + 'doc_type')))
+    print(type(utility.get(str(message.chat.id) + 'doc_type')))
     url_for_save_contract = 'https://web.ewa.ua/ewa/api/v9/contract/save'
     json_string = json.dumps(contract_data)
     r = requests.post(url_for_save_contract, headers=headers, cookies=cookies,
                       data=json_string)  # Перевод договора в состояние ЧЕРНОВИК
     print(r)
+    print(r.json())
     bad_data = 0
     try:
         id_contract = r.json()['id']
