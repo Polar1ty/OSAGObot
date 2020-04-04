@@ -179,7 +179,7 @@ def help(message):
 @bot.message_handler(commands=['rules'])
 def rules(message):
     bot.send_message(message.chat.id,
-                     'У вас є 15 хвилин для того, щоби завершити оплату та отримання полісу у форматі PDF, тому радимо одразу мати під рукою усі необхідні документи - свідоцтво про реєстрацію транспортного засобу (техпаспорт), паспорт, id-карту або посвідчення водія.Вводити інформацію слід українською мовою, аби у майбутньому уникнути будь-яких непорозумінь при настанні страхового випадку.Оплата відбувається за допомогою платіжного сервісу Liqpay безпосередньо з мобільної версії Telegram, при використанні desktop-версії оплата наразі не підтримується (у розробці).При виникненні технічних помилок потрібно перезавантажити бота, натиснувши /reset, і почати спочатку.При виникненні питань фінансового характеру зверніться до служби підтримки, натиснувши /help.Договір оферти за посиланням: http://zarazpolis.pp.ua/confidentiality.html')
+                     'У вас є 15 хвилин для того, щоби завершити оплату та отримання полісу у форматі PDF, тому радимо одразу мати під рукою усі необхідні документи - свідоцтво про реєстрацію транспортного засобу (техпаспорт), паспорт, id-карту або посвідчення водія.\n\nВводити інформацію слід українською мовою, аби у майбутньому уникнути будь-яких непорозумінь при настанні страхового випадку.\n\nОплата відбувається за допомогою платіжного сервісу Liqpay безпосередньо з мобільної версії Telegram, при використанні desktop-версії оплата наразі не підтримується (у розробці).\n\nПри виникненні технічних помилок потрібно перезавантажити бота, натиснувши /reset, і почати спочатку.\n\nПри виникненні питань фінансового характеру зверніться до служби підтримки, натиснувши /help.\n\nДоговір оферти за посиланням: http://zarazpolis.pp.ua/confidentiality.html')
 
 
 @bot.message_handler(commands=['start'])
@@ -190,7 +190,7 @@ def hello(message):
     results1 = q.fetchone()
     if results1[0] != 1:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        button1 = types.KeyboardButton('ПІДІБРАТИ ПОЛІС🚘')
+        button1 = types.KeyboardButton('ПІДІБРАТИ ПОЛІС 🚘')
         markup.add(button1)
         bot.send_message(message.chat.id,
                          'Вітаємо, {0.first_name}! Я - бот {1.first_name}, готовий працювати.'.format(
@@ -256,7 +256,7 @@ def hello(message):
         prefinal(message)
 
 
-@bot.message_handler(func=lambda message: message.text == 'ПІДІБРАТИ ПОЛІС🚘')
+@bot.message_handler(func=lambda message: message.text == 'ПІДІБРАТИ ПОЛІС 🚘')
 def auto_number(message):
     bot.send_message(message.chat.id, 'Введіть реєстраційний номер авто (АА0000АА):✍')
     dbworker.set_state(message.chat.id, config.States.S_NUMBER_CAR.value)
@@ -290,7 +290,7 @@ def asking_city(message):
             connection.close()
             bot.send_message(message.chat.id,
                              'Модель: {0}\nVIN-код: {1}\nРеєстраційний номер: {2}'.format(model, vin_code, car_nmb))
-            bot.send_message(message.chat.id, 'Введіть місце реєстрації авто:🏢')
+            bot.send_message(message.chat.id, 'Введіть місце реєстрації авто:✍')
             dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
     except IndexError:
         bot.send_message(message.chat.id, 'Такого номера не існує. Спробуйте ще раз')
@@ -343,7 +343,7 @@ def final_city(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_REGISTRATION_CITY.value)
 def submitting(message):
-    bot.send_message(message.chat.id, 'Виберіть ваш найкращий варіант:📊⬇')
+    bot.send_message(message.chat.id, 'Виберіть ваш найкращий варіант:👇')
     try:
         if message.text == utility.get(str(message.chat.id) + 'city1')['name_full']:
             id = utility.get(str(message.chat.id) + 'city1')['id']
@@ -395,49 +395,49 @@ def submitting(message):
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff8")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff8")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff8")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff8")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff8")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff8")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff8")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff7")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff7")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff7")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff7")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff7")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff7")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff7")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff6")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff6")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff6")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff6")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff6")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff6")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff6")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff5")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff5")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff5")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff5")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff5")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff5")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff5")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff4")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff4")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff4")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff4")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff4")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff4")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff4")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff3")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff3")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff3")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff3")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff3")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff3")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff3")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff2")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff2")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff2")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff2")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff2")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff2")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff2")[4])
     except TypeError:
         pass
     try:
         bot.send_message(message.chat.id,
-                         f'👔{utility.get(str(message.chat.id) + "tariff1")[0]}\n💼Франшиза: {utility.get(str(message.chat.id) + "tariff1")[2]}\n\n💵Вартість: {utility.get(str(message.chat.id) + "tariff1")[1]}',
+                         f'👔 {utility.get(str(message.chat.id) + "tariff1")[0]}\n💼 Франшиза: {utility.get(str(message.chat.id) + "tariff1")[2]}\n\n💵 Вартість: {utility.get(str(message.chat.id) + "tariff1")[1]}',
                          reply_markup=utility.get(str(message.chat.id) + "tariff1")[4])
     except TypeError:
         pass
@@ -465,7 +465,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff1")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -486,7 +486,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff2")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -507,7 +507,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff3")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -528,7 +528,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff4")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -549,7 +549,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff5")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -570,7 +570,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff6")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -591,7 +591,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff7")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -612,7 +612,7 @@ def callback_inline(call):
                 {str(call.message.chat.id) + 'min_bonus_malus': utility.get(str(call.message.chat.id) + "tariff8")[7]})
             if utility.get(str(call.message.chat.id) + 'car_year') is None:
                 bot.send_message(call.message.chat.id,
-                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)')
+                                 'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
                 bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
@@ -684,7 +684,7 @@ def patronymic_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть дату свого народження (у форматі РРРР-ММ-ДД):✍')
+    bot.send_message(message.chat.id, 'Введіть дату свого народження\n\n(у форматі РРРР-ММ-ДД):✍')
     dbworker.set_state(message.chat.id, config.States.S_DATE_OF_BIRTH.value)
 
 
@@ -700,7 +700,7 @@ def date_of_birth_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть адресу своєї реєстрації (у форматі: місто, вулиця, дім, квартира):✍')
+    bot.send_message(message.chat.id, 'Введіть адресу своєї реєстрації\n\n(у форматі: місто, вулиця, дім, квартира):✍')
     dbworker.set_state(message.chat.id, config.States.S_ADDRESS.value)
 
 
@@ -734,7 +734,7 @@ def inn_taking(message):
         q.close()
         connection.close()
         # database
-        bot.send_message(message.chat.id, 'Введіть email, на який ви бажаєте отримати електронний поліс:✍')
+        bot.send_message(message.chat.id, 'Введіть email, на який ви отриматє електронний поліс:✍')
         dbworker.set_state(message.chat.id, config.States.S_EMAIL.value)
 
 
@@ -749,7 +749,7 @@ def email_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть номер мобільного телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):✍')
+    bot.send_message(message.chat.id, 'Введіть номер телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):✍')
     dbworker.set_state(message.chat.id, config.States.S_PHONE.value)
 
 
@@ -763,6 +763,21 @@ def phone_taking(message):
     connection.commit()
     q.close()
     connection.close()
+    # bot.send_message(message.chat.id, 'Введіть серію паспорта (2 літери):✍')
+    # dbworker.set_state(message.chat.id, config.States.S_SERIES.value)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    button1 = types.KeyboardButton('Паспорт 📖')
+    button2 = types.KeyboardButton('ID-карта')
+    button3 = types.KeyboardButton('Посвідчення водія 🚘')
+    markup.add(button1, button2, button3)
+    bot.send_message(message.chat.id, 'Ваш документ:', reply_markup=markup)
+    dbworker.clear_db(message.chat.id)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@bot.message_handler(func=lambda message: message.text == 'Паспорт 📖')
+def passport(message):
     bot.send_message(message.chat.id, 'Введіть серію паспорта (2 літери):✍')
     dbworker.set_state(message.chat.id, config.States.S_SERIES.value)
 
@@ -830,6 +845,149 @@ def issued_taking(message):
     connection.close()
     prefinal(message)
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+@bot.message_handler(func=lambda message: message.text == 'ID-карта')
+def id_card(message):
+    bot.send_message(message.chat.id, 'Введіть номер ID-карти:✍')
+    dbworker.set_state(message.chat.id, config.States.S_ID_SERIES.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_SERIES.value)
+def series_id_taking(message):
+    log(message)
+    series = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("SELECT EXISTS(SELECT 1 FROM passport WHERE id='%s')" % message.from_user.id)
+    results1 = q.fetchone()
+    if results1[0] != 1:
+        q.execute("INSERT INTO 'passport' (id) VALUES ('%s')" % message.from_user.id)
+    q.execute("UPDATE passport SET series='%s' WHERE id='%s'" % (series, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    bot.send_message(message.chat.id, 'Введіть запис ID карти:✍')
+    dbworker.set_state(message.chat.id, config.States.S_ID_NUMBER.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_NUMBER.value)
+def number_id_taking(message):
+    log(message)
+    number = message.text
+    # if len(number) != 6:
+    #     bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
+    #     dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
+    # else:
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    bot.send_message(message.chat.id, 'Введіть дату видачі ID-карти (у форматі РРРР-ММ-ДД):✍')
+    dbworker.set_state(message.chat.id, config.States.S_ID_DATE.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_DATE.value)
+def date_id_taking(message):
+    log(message)
+    date = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET date='%s' WHERE id='%s'" % (date, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    bot.send_message(message.chat.id, 'Введіть орган, що видав ID-карту:✍')
+    dbworker.set_state(message.chat.id, config.States.S_ID_ISSUED_BY.value)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_ISSUED_BY.value)
+def issued_id_taking(message):
+    log(message)
+    issued_by = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET issued_by='%s' WHERE id='%s'" % (issued_by, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    prefinal(message)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+@bot.message_handler(func=lambda message: message.text == 'Посвідчення водія 🚘')
+def driver_license(message):
+    bot.send_message(message.chat.id, 'Введіть серію посвідчення (2 літери):✍')
+    dbworker.set_state(message.chat.id, config.States.S_DRIVER_SERIES.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_SERIES.value)
+def series_driver_taking(message):
+    log(message)
+    series = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("SELECT EXISTS(SELECT 1 FROM passport WHERE id='%s')" % message.from_user.id)
+    results1 = q.fetchone()
+    if results1[0] != 1:
+        q.execute("INSERT INTO 'passport' (id) VALUES ('%s')" % message.from_user.id)
+    q.execute("UPDATE passport SET series='%s' WHERE id='%s'" % (series, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    bot.send_message(message.chat.id, 'Введіть номер посвідчення:✍')
+    dbworker.set_state(message.chat.id, config.States.S_DRIVER_NUMBER.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_NUMBER.value)
+def number_driver_taking(message):
+    log(message)
+    number = message.text
+    # if len(number) != 6:
+    #     bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
+    #     dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
+    # else:
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    bot.send_message(message.chat.id, 'Введіть дату видачі посвідчення (у форматі РРРР-ММ-ДД):✍')
+    dbworker.set_state(message.chat.id, config.States.S_DRIVER_DATE.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_DATE.value)
+def date_driver_taking(message):
+    log(message)
+    date = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET date='%s' WHERE id='%s'" % (date, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    bot.send_message(message.chat.id, 'Введіть орган, що видав посвідчення:✍')
+    dbworker.set_state(message.chat.id, config.States.S_DRIVER_ISSUED_BY.value)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_ISSUED_BY.value)
+def issued_driver_taking(message):
+    log(message)
+    issued_by = message.text
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET issued_by='%s' WHERE id='%s'" % (issued_by, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    prefinal(message)
+
 
 def prefinal(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -848,7 +1006,7 @@ def prefinal(message):
     q.close()
     connection.close()
     bot.send_message(message.chat.id,
-                     f"Дані автомобіля🚘⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація🤵⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖⬇\n\nСерія паспорта:  {results1[0][1]}\nНомер паспорта:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
+                     f"Дані автомобіля🚘⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація😉⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖⬇\n\nСерія паспорта:  {results1[0][1]}\nНомер паспорта:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
                      reply_markup=markup)
     dbworker.clear_db(message.chat.id)
 
@@ -871,7 +1029,7 @@ def yes(message):
     q.close()
     connection.close()
 
-    bot.send_message(message.chat.id, 'Добре!👍 Переходжу до формування договору📝\nЗачекайте⏳',
+    bot.send_message(message.chat.id, 'Добре!👍\nПереходжу до формування договору📝\nЗачекайте⏳',
                      reply_markup=types.ReplyKeyboardRemove())
 
     d = date_from_to(message)
@@ -1016,7 +1174,7 @@ def yes(message):
         r_otp = requests.get(url_for_otp, headers=headers, cookies=cookies)
         print(r_otp)
         bot.send_message(message.chat.id,
-                         '📲На ваш мобільний телефон було відправлено СМС з паролем для підпису електронного полісу.Введіть, будь-ласка, пароль з повідомлення')
+                         '📲На ваш мобільний телефон було відправлено СМС з паролем для підпису електронного полісу.\n\nВведіть пароль з повідомлення✍')
         dbworker.set_state(message.chat.id, config.States.S_OTP.value)
 
 
@@ -1137,7 +1295,7 @@ def process_successful_payment(message: types.Message):
     rf = requests.post(url_for_emi, headers=headers, cookies=cookies)  # перевод договора в состояние ЗАКЛЮЧЕН
     print(rf)
     bot.send_message(message.chat.id,
-                     'Платіж пройшов успішно!📠 Перевірте пошту, яку вказували при оформленні - ваш електронний поліс у форматі PDF має бути там📬Дякуємо за співпрацю! До зустрічі через рік (а можливо і раніше).Якщо ви задоволені моєю роботою - поділіться мною, будь-ласка, з другом - https://t.me/osago_insurance_bot.')
+                     '👌Платіж пройшов успішно!\n\n📬Перевірте пошту, яку вказували при оформленні - ваш електронний поліс у форматі PDF має бути там.\n\n👏Якщо ви задоволені моєю роботою - поділіться мною, будь-ласка, з другом  - https://t.me/osago_insurance_bot.')
     dbworker.clear_db(message.chat.id)
     try:
         utility.pop(str(message.chat.id) + 'city1')
