@@ -8,6 +8,7 @@ import requests
 import sqlite3 as sql
 import json
 import random
+import tg_analytic
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -137,6 +138,7 @@ headers = {
 
 @bot.message_handler(commands=['reset'])
 def reset(message):
+    tg_analytic.statistics(message.chat.id, message.text)
     try:
         dbworker.clear_db(message.chat.id)
         utility.pop(str(message.chat.id) + 'city1')
@@ -173,17 +175,20 @@ def reset(message):
 
 @bot.message_handler(commands=['help'])
 def help(message):
+    tg_analytic.statistics(message.chat.id, message.text)
     bot.send_message(message.chat.id, 'Зверніться в службу підтримки🏳\n +380XX-XXX-XX-XX')
 
 
 @bot.message_handler(commands=['rules'])
 def rules(message):
+    tg_analytic.statistics(message.chat.id, message.text)
     bot.send_message(message.chat.id,
                      'У вас є 15 хвилин для того, щоби завершити оплату та отримання полісу у форматі PDF, тому радимо одразу мати під рукою усі необхідні документи - свідоцтво про реєстрацію транспортного засобу (техпаспорт), паспорт, id-карту або посвідчення водія.\n\nВводити інформацію слід українською мовою, аби у майбутньому уникнути будь-яких непорозумінь при настанні страхового випадку.\n\nОплата відбувається за допомогою платіжного сервісу Liqpay безпосередньо з мобільної версії Telegram, при використанні desktop-версії оплата наразі не підтримується (у розробці).\n\nПри виникненні технічних помилок потрібно перезавантажити бота, натиснувши /reset, і почати спочатку.\n\nПри виникненні питань фінансового характеру зверніться до служби підтримки, натиснувши /help.\n\nДоговір оферти за посиланням: http://zarazpolis.pp.ua/confidentiality.html')
 
 
 @bot.message_handler(commands=['start'])
 def hello(message):
+    tg_analytic.statistics(message.chat.id, message.text)
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
@@ -640,7 +645,7 @@ def car_year_taking(message):
         q.close()
         connection.close()
         # database
-        bot.send_message(message.chat.id, 'Напишіть ваше прізвище(українською):✍')
+        bot.send_message(message.chat.id, 'Введіть ваше прізвище(українською):✍')
         dbworker.set_state(message.chat.id, config.States.S_SURNAME.value)
 
 
@@ -1713,6 +1718,20 @@ def issued_taking_again(message):
     q.close()
     connection.close()
     prefinal(message)
+
+
+@bot.message_handler(content_types=['text'])
+def text(message):
+    if message.text[:10] == 'статистика' or message.text[:10] == 'Cтатистика':
+        st = message.text.split(' ')
+        if 'txt' in st or 'тхт' in st:
+            tg_analytic.analysis(st, message.chat.id)
+            with open('%s.txt' % message.chat.id, 'r', encoding='UTF-8') as file:
+                bot.send_document(message.chat.id, file)
+            tg_analytic.remove(message.chat.id)
+        else:
+            messages = tg_analytic.analysis(st, message.chat.id)
+            bot.send_message(message.chat.id, messages)
 
 
 """
