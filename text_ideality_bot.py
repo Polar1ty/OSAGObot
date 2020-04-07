@@ -9,6 +9,8 @@ import sqlite3 as sql
 import json
 import random
 import tg_analytic
+import os
+import time
 
 bot = telebot.TeleBot(config.TOKEN)
 
@@ -176,7 +178,7 @@ def reset(message):
 @bot.message_handler(commands=['help'])
 def help(message):
     tg_analytic.statistics(message.chat.id, message.text)
-    bot.send_message(message.chat.id, 'Напишіть ваше питання, воно буде надіслане до опература служби допомоги.')
+    bot.send_message(message.chat.id, 'Напишіть ваше питання, воно буде надіслане до оператора служби підтримки.')
     dbworker.set_state(message.chat.id, config.States.S_HELP.value)
 
 
@@ -184,7 +186,96 @@ def help(message):
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_HELP.value)
 def getting_help_msg(message):
     help_msg = message.text
-
+    try:
+        doc_type = utility.get(str(message.chat.id) + 'doc_type')
+    except KeyError:
+        doc_type = ' '
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("SELECT * from user WHERE id='%s'" % message.from_user.id)
+    results = q.fetchall()
+    q.execute("SELECT * from passport WHERE id='%s'" % message.from_user.id)
+    results1 = q.fetchall()
+    connection.commit()
+    q.close()
+    connection.close()
+    try:
+        model = results[0][1]
+    except IndexError:
+        model = ''
+    try:
+        VIN = results[0][2]
+    except IndexError:
+        VIN = ''
+    try:
+        reg_number = results[0][3]
+    except IndexError:
+        reg_number = ''
+    try:
+        category = results[0][4]
+    except IndexError:
+        category = ''
+    try:
+        year_car = results[0][5]
+    except IndexError:
+        year_car = ''
+    try:
+        surname = results[0][6]
+    except IndexError:
+        surname = ''
+    try:
+        name = results[0][7]
+    except IndexError:
+        name = ''
+    try:
+        patronymic = results[0][8]
+    except IndexError:
+        patronymic = ''
+    try:
+        birth = results[0][9]
+    except IndexError:
+        birth = ''
+    try:
+        reg_addres = results[0][10]
+    except IndexError:
+        reg_addres = ''
+    try:
+        INN = results[0][11]
+    except IndexError:
+        INN = ''
+    try:
+        email = results[0][12]
+    except IndexError:
+        email = ''
+    try:
+        phone = results[0][13]
+    except IndexError:
+        phone = ''
+    try:
+        series = results1[0][1]
+    except IndexError:
+        series = ''
+    try:
+        doc_num = results1[0][2]
+    except IndexError:
+        doc_num = ''
+    try:
+        date = results1[0][3]
+    except IndexError:
+        date = ''
+    try:
+        organ = results1[0][4]
+    except IndexError:
+        organ = ''
+    # bot.send_message(config.help_chat_id, f'Автор питання: @{message.from_user.username}\nПитання: {help_msg}')
+    with open(f'{message.from_user.id}.txt', 'a', encoding='utf8') as f:
+        f.write(f"# -*- coding: utf8 -*-\n\n\nДані автомобіля🚘\n\nМодель:  {model}\nVIN-код:  {VIN}\nРеєстраційний номер:  {reg_number}\nКатегорія:  {category}\nРік випуску:  {year_car}\n\nВаша особиста інформація😉\n\nПрізвище:  {surname}\nІм'я:  {name}\nПо-батькові:  {patronymic}\nДата народждения:  {birth}\nАдреса реєстрації:  {reg_addres}\nІНПП:  {INN}\nEMAIL:  {email}\nТелефон:  {phone}\n\nДані вашого документа📖\n\nТип документа: {doc_type}\nСерія/Запис документа:  {series}\nНомер документа:  {doc_num}\nДата видачі:  {date}\nОрган, що видав:  {organ}")
+        time.sleep(1)
+    bot.send_document(config.help_chat_id, open(f'{message.from_user.id}.txt', 'r', encoding='utf8'), caption=f'Автор питання: @{message.from_user.username}\nПитання: {help_msg}')
+    # path = os.getcwd() + f'{message.from_user.id}.txt'
+    os.remove(f'{message.from_user.id}.txt')
+    bot.send_message(message.chat.id, 'Ваше питання в обробці. Незабаром Вам відповість наш оператор')
+    dbworker.clear_db(message.chat.id)
 
 @bot.message_handler(commands=['rules'])
 def rules(message):
@@ -1022,8 +1113,76 @@ def prefinal(message):
     connection.commit()
     q.close()
     connection.close()
+    try:
+        model = results[0][1]
+    except IndexError:
+        model = ''
+    try:
+        VIN = results[0][2]
+    except IndexError:
+        VIN = ''
+    try:
+        reg_number = results[0][3]
+    except IndexError:
+        reg_number = ''
+    try:
+        category = results[0][4]
+    except IndexError:
+        category = ''
+    try:
+        year_car = results[0][5]
+    except IndexError:
+        year_car = ''
+    try:
+        surname = results[0][6]
+    except IndexError:
+        surname = ''
+    try:
+        name = results[0][7]
+    except IndexError:
+        name = ''
+    try:
+        patronymic = results[0][8]
+    except IndexError:
+        patronymic = ''
+    try:
+        birth = results[0][9]
+    except IndexError:
+        birth = ''
+    try:
+        reg_addres = results[0][10]
+    except IndexError:
+        reg_addres = ''
+    try:
+        INN = results[0][11]
+    except IndexError:
+        INN = ''
+    try:
+        email = results[0][12]
+    except IndexError:
+        email = ''
+    try:
+        phone = results[0][13]
+    except IndexError:
+        phone = ''
+    try:
+        series = results1[0][1]
+    except IndexError:
+        series = ''
+    try:
+        doc_num = results1[0][2]
+    except IndexError:
+        doc_num = ''
+    try:
+        date = results1[0][3]
+    except IndexError:
+        date = ''
+    try:
+        organ = results1[0][4]
+    except IndexError:
+        organ = ''
     bot.send_message(message.chat.id,
-                     f"Дані автомобіля🚘\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація😉\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖\n\nСерія/Запис документа:  {results1[0][1]}\nНомер документа:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
+                     f"Дані автомобіля🚘\n\nМодель:  {model}\nVIN-код:  {VIN}\nРеєстраційний номер:  {reg_number}\nКатегорія:  {category}\nРік випуску:  {year_car}\n\nВаша особиста інформація😉\n\nПрізвище:  {surname}\nІм'я:  {name}\nПо-батькові:  {patronymic}\nДата народждения:  {birth}\nАдреса реєстрації:  {reg_addres}\nІНПП:  {INN}\nEMAIL:  {email}\nТелефон:  {phone}\n\nДані вашого документа📖\n\nСерія/Запис документа:  {series}\nНомер документа:  {doc_num}\nДата видачі:  {date}\nОрган, що видав:  {organ}",
                      reply_markup=markup)
     dbworker.clear_db(message.chat.id)
 
