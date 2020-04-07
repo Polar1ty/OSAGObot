@@ -176,7 +176,14 @@ def reset(message):
 @bot.message_handler(commands=['help'])
 def help(message):
     tg_analytic.statistics(message.chat.id, message.text)
-    bot.send_message(message.chat.id, 'Зверніться в службу підтримки🏳\n +380XX-XXX-XX-XX')
+    bot.send_message(message.chat.id, 'Напишіть ваше питання, воно буде надіслане до опература служби допомоги.')
+    dbworker.set_state(message.chat.id, config.States.S_HELP.value)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_HELP.value)
+def getting_help_msg(message):
+    help_msg = message.text
 
 
 @bot.message_handler(commands=['rules'])
@@ -1016,7 +1023,7 @@ def prefinal(message):
     q.close()
     connection.close()
     bot.send_message(message.chat.id,
-                     f"Дані автомобіля🚘⬇\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація😉⬇\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖⬇\n\nСерія/Запис документа:  {results1[0][1]}\nНомер документа:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
+                     f"Дані автомобіля🚘\n\nМодель:  {results[0][1]}\nVIN-код:  {results[0][2]}\nРеєстраційний номер:  {results[0][3]}\nКатегорія:  {results[0][4]}\nРік випуску:  {results[0][5]}\n\nВаша особиста інформація😉\n\nПрізвище:  {results[0][6]}\nІм'я:  {results[0][7]}\nПо-батькові:  {results[0][8]}\nДата народждения:  {results[0][9]}\nАдреса реєстрації:  {results[0][10]}\nІНПП:  {results[0][11]}\nEMAIL:  {results[0][12]}\nТелефон:  {results[0][13]}\n\nДані вашого документа📖\n\nСерія/Запис документа:  {results1[0][1]}\nНомер документа:  {results1[0][2]}\nДата видачі:  {results1[0][3]}\nОрган, що видав:  {results1[0][4]}",
                      reply_markup=markup)
     dbworker.clear_db(message.chat.id)
 
@@ -1448,8 +1455,8 @@ def no(message):
     button7 = types.KeyboardButton('ІНПП')
     button8 = types.KeyboardButton('EMAIL')
     button9 = types.KeyboardButton('Телефон')
-    button10 = types.KeyboardButton('Серія паспорта')
-    button11 = types.KeyboardButton('Номер паспорта')
+    button10 = types.KeyboardButton('Серія документа')
+    button11 = types.KeyboardButton('Номер документа')
     button12 = types.KeyboardButton('Дата видачі')
     button13 = types.KeyboardButton('Орган видачі')
     markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
@@ -1639,9 +1646,9 @@ def phone_taking_again(message):
     prefinal(message)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Серія паспорта')
+@bot.message_handler(func=lambda message: message.text == 'Серія документа')
 def series_set(message):
-    bot.send_message(message.chat.id, 'Введіть вашу серію паспорта:✍')
+    bot.send_message(message.chat.id, 'Введіть вашу серію/запис документа:✍')
     dbworker.set_state(message.chat.id, config.States.S1_SERIES.value)
 
 
@@ -1658,9 +1665,9 @@ def series_taking_again(message):
     prefinal(message)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Номер паспорта')
+@bot.message_handler(func=lambda message: message.text == 'Номер документа')
 def number_set(message):
-    bot.send_message(message.chat.id, 'Введіть ваш номер паспорта:✍')
+    bot.send_message(message.chat.id, 'Введіть ваш номер документа:✍')
     dbworker.set_state(message.chat.id, config.States.S1_NUMBER.value)
 
 
@@ -1668,22 +1675,18 @@ def number_set(message):
 def number_taking_again(message):
     log(message)
     v = message.text
-    if len(v) != 6:
-        bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
-        dbworker.set_state(message.chat.id, config.States.S1_NUMBER.value)
-    else:
-        connection = sql.connect('DATABASE.sqlite')
-        q = connection.cursor()
-        q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (v, message.from_user.id))
-        connection.commit()
-        q.close()
-        connection.close()
-        prefinal(message)
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (v, message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    prefinal(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Дата видачі')
 def date_set(message):
-    bot.send_message(message.chat.id, 'Введіть дату видачі паспорта(в форматі РРРР-ММ-ДД):✍')
+    bot.send_message(message.chat.id, 'Введіть дату видачі документа(в форматі РРРР-ММ-ДД):✍')
     dbworker.set_state(message.chat.id, config.States.S1_DATE.value)
 
 
@@ -1702,7 +1705,7 @@ def date_taking_again(message):
 
 @bot.message_handler(func=lambda message: message.text == 'Орган видачі')
 def issued_set(message):
-    bot.send_message(message.chat.id, 'Введіть орган видачі паспорта:✍')
+    bot.send_message(message.chat.id, 'Введіть орган видачі документа:✍')
     dbworker.set_state(message.chat.id, config.States.S1_ISSUED_BY.value)
 
 
