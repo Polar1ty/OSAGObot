@@ -267,12 +267,10 @@ def getting_help_msg(message):
         organ = results1[0][4]
     except IndexError:
         organ = ''
-    # bot.send_message(config.help_chat_id, f'Автор питання: @{message.from_user.username}\nПитання: {help_msg}')
     with open(f'{message.from_user.id}.txt', 'a', encoding='utf8') as f:
         f.write(f"# -*- coding: utf8 -*-\n\n\nДані автомобіля🚘\n\nМодель:  {model}\nVIN-код:  {VIN}\nРеєстраційний номер:  {reg_number}\nКатегорія:  {category}\nРік випуску:  {year_car}\n\nВаша особиста інформація😉\n\nПрізвище:  {surname}\nІм'я:  {name}\nПо-батькові:  {patronymic}\nДата народждения:  {birth}\nАдреса реєстрації:  {reg_addres}\nІНПП:  {INN}\nEMAIL:  {email}\nТелефон:  {phone}\n\nДані вашого документа📖\n\nТип документа: {doc_type}\nСерія/Запис документа:  {series}\nНомер документа:  {doc_num}\nДата видачі:  {date}\nОрган, що видав:  {organ}")
         time.sleep(1)
     bot.send_document(config.help_chat_id, open(f'{message.from_user.id}.txt', 'r', encoding='utf8'), caption=f'Автор питання: @{message.from_user.username}\nПитання: {help_msg}')
-    # path = os.getcwd() + f'{message.from_user.id}.txt'
     os.remove(f'{message.from_user.id}.txt')
     bot.send_message(message.chat.id, 'Ваше питання в обробці. Незабаром Вам відповість наш оператор')
     dbworker.clear_db(message.chat.id)
@@ -1026,6 +1024,7 @@ def issued_id_taking(message):
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+
 @bot.message_handler(func=lambda message: message.text == 'Посвідчення водія 🚘')
 def driver_license(message):
     utility.update({str(message.chat.id) + 'doc_type': 'DRIVING_LICENSE'})
@@ -1205,7 +1204,7 @@ def yes(message):
     q.close()
     connection.close()
 
-    bot.send_message(message.chat.id, 'Добре!👍\nПереходжу до формування договору📝\nЗачекайте⏳',
+    bot.send_message(message.chat.id, 'Добре!\n📝Формую договір\n⏳Зачекайте',
                      reply_markup=types.ReplyKeyboardRemove())
 
     d = date_from_to(message)
@@ -1610,7 +1609,7 @@ def no(message):
     button3 = types.KeyboardButton("І'мя")
     button4 = types.KeyboardButton('По-батькові')
     button5 = types.KeyboardButton('Дата нарождения')
-    button6 = types.KeyboardButton('Адреса прописки')
+    button6 = types.KeyboardButton('Адреса реєстрації')
     button7 = types.KeyboardButton('ІНПП')
     button8 = types.KeyboardButton('EMAIL')
     button9 = types.KeyboardButton('Телефон')
@@ -1725,7 +1724,7 @@ def date_taking_again(message):
     prefinal(message)
 
 
-@bot.message_handler(func=lambda message: message.text == 'Адреса прописки')
+@bot.message_handler(func=lambda message: message.text == 'Адреса реєстрації')
 def address_set(message):
     bot.send_message(message.chat.id, 'Введіть вашу адресу прописки(в форматі "Місто,Вулиця,Дім,Квартира"):✍')
     dbworker.set_state(message.chat.id, config.States.S1_ADDRESS.value)
