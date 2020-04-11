@@ -268,12 +268,15 @@ def getting_help_msg(message):
     except IndexError:
         organ = ''
     with open(f'{message.from_user.id}.txt', 'a', encoding='utf8') as f:
-        f.write(f"# -*- coding: utf8 -*-\n\n\nДані автомобіля🚘\n\nМодель:  {model}\nVIN-код:  {VIN}\nРеєстраційний номер:  {reg_number}\nКатегорія:  {category}\nРік випуску:  {year_car}\n\nВаша особиста інформація😉\n\nПрізвище:  {surname}\nІм'я:  {name}\nПо-батькові:  {patronymic}\nДата народждения:  {birth}\nАдреса реєстрації:  {reg_addres}\nІНПП:  {INN}\nEMAIL:  {email}\nТелефон:  {phone}\n\nДані вашого документа📖\n\nТип документа: {doc_type}\nСерія/Запис документа:  {series}\nНомер документа:  {doc_num}\nДата видачі:  {date}\nОрган, що видав:  {organ}")
+        f.write(
+            f"# -*- coding: utf8 -*-\n\n\nДані автомобіля🚘\n\nМодель:  {model}\nVIN-код:  {VIN}\nРеєстраційний номер:  {reg_number}\nКатегорія:  {category}\nРік випуску:  {year_car}\n\nВаша особиста інформація😉\n\nПрізвище:  {surname}\nІм'я:  {name}\nПо-батькові:  {patronymic}\nДата народждения:  {birth}\nАдреса реєстрації:  {reg_addres}\nІНПП:  {INN}\nEMAIL:  {email}\nТелефон:  {phone}\n\nДані вашого документа📖\n\nТип документа: {doc_type}\nСерія/Запис документа:  {series}\nНомер документа:  {doc_num}\nДата видачі:  {date}\nОрган, що видав:  {organ}")
         time.sleep(1)
-    bot.send_document(config.help_chat_id, open(f'{message.from_user.id}.txt', 'r', encoding='utf8'), caption=f'Автор питання: @{message.from_user.username}\nПитання: {help_msg}')
+    bot.send_document(config.help_chat_id, open(f'{message.from_user.id}.txt', 'r', encoding='utf8'),
+                      caption=f'Автор питання: @{message.from_user.username}\nПитання: {help_msg}')
     os.remove(f'{message.from_user.id}.txt')
     bot.send_message(message.chat.id, 'Ваше питання в обробці. Незабаром Вам відповість наш оператор')
     dbworker.clear_db(message.chat.id)
+
 
 @bot.message_handler(commands=['rules'])
 def rules(message):
@@ -294,7 +297,7 @@ def hello(message):
         button1 = types.KeyboardButton('ПІДІБРАТИ ПОЛІС 🚘')
         markup.add(button1)
         bot.send_message(message.chat.id,
-                         'Вітаємо, {0.first_name}! Я - бот {1.first_name}, готовий працювати.'.format(
+                         'Вітаємо, {0.first_name}! Я - бот {1.first_name}, готовий працювати.\nПочати - /start\nПерезавантажити бота - /reset\nПравила користування - /rules\nДопомога - /help'.format(
                              message.from_user, bot.get_me()), reply_markup=markup)
         q.execute("INSERT INTO 'user' (id) VALUES ('%s')" % message.from_user.id)
         connection.commit()
@@ -323,7 +326,8 @@ def hello(message):
             str(message.chat.id) + 'contract_id': '',
             str(message.chat.id) + 'min_bonus_malus': '',
             str(message.chat.id) + 'car_year': '',
-            str(message.chat.id) + 'order': ''
+            str(message.chat.id) + 'order': '',
+            str(message.chat.id) + 'car_changer': ''
         }
     else:
         bot.send_message(message.chat.id,
@@ -372,6 +376,7 @@ def asking_city(message):
     number_car = urllib.parse.quote(message.text)
     url = f'https://web.ewa.ua/ewa/api/v9/auto/mtibu/number?query={number_car}'
     response = requests.get(url, headers=headers, cookies=cookies)
+    print(response.json())
     try:
         model = response.json()[0]['modelText']
         vin_code = str(response.json()[0]['bodyNumber']).upper()
@@ -381,7 +386,18 @@ def asking_city(message):
             bot.send_message(message.chat.id,
                              '🚌Страховка автобусів не підтримується.')
             auto_number(message)
-
+        elif utility.get(str(message.chat.id) + 'car_changer') == '1':
+            connection = sql.connect('DATABASE.sqlite')
+            q = connection.cursor()
+            q.execute("UPDATE user SET number_car='%s',category='%s',model_car='%s',vin_code='%s' WHERE id='%s'" % (
+                message.text, category, model, vin_code, message.from_user.id))
+            connection.commit()
+            q.close()
+            connection.close()
+            bot.send_message(message.chat.id,
+                             'Модель: {0}\nVIN-код: {1}\nРеєстраційний номер: {2}'.format(model, vin_code, car_nmb))
+            utility.pop(str(message.chat.id) + 'car_changer')
+            car_year_set(message)
         else:
             # запись в базу
             connection = sql.connect('DATABASE.sqlite')
@@ -852,7 +868,8 @@ def email_taking(message):
     q.close()
     connection.close()
     # database
-    bot.send_message(message.chat.id, 'Введіть номер телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):✍')
+    bot.send_message(message.chat.id,
+                     'Введіть номер телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):✍')
     dbworker.set_state(message.chat.id, config.States.S_PHONE.value)
 
 
@@ -875,6 +892,7 @@ def phone_taking(message):
     markup.add(button1, button2, button3)
     bot.send_message(message.chat.id, 'Ваш документ:', reply_markup=markup)
     dbworker.clear_db(message.chat.id)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -949,6 +967,7 @@ def issued_taking(message):
     connection.close()
     prefinal(message)
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -959,40 +978,46 @@ def id_card(message):
     dbworker.set_state(message.chat.id, config.States.S_ID_SERIES.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_SERIES.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_SERIES.value)
 def series_id_taking(message):
     log(message)
     series = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("SELECT EXISTS(SELECT 1 FROM passport WHERE id='%s')" % message.from_user.id)
-    results1 = q.fetchone()
-    if results1[0] != 1:
-        q.execute("INSERT INTO 'passport' (id) VALUES ('%s')" % message.from_user.id)
-    q.execute("UPDATE passport SET series='%s' WHERE id='%s'" % (series, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    bot.send_message(message.chat.id, 'Введіть номер ID-карти:✍')
-    dbworker.set_state(message.chat.id, config.States.S_ID_NUMBER.value)
+    if len(series) != 14:
+        bot.send_message(message.chat.id, 'Запис ID-карти має містити 14 символів. Спробуйте ще')
+        id_card(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("SELECT EXISTS(SELECT 1 FROM passport WHERE id='%s')" % message.from_user.id)
+        results1 = q.fetchone()
+        if results1[0] != 1:
+            q.execute("INSERT INTO 'passport' (id) VALUES ('%s')" % message.from_user.id)
+        q.execute("UPDATE passport SET series='%s' WHERE id='%s'" % (series, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        bot.send_message(message.chat.id, 'Введіть номер ID-карти:✍')
+        dbworker.set_state(message.chat.id, config.States.S_ID_NUMBER.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_NUMBER.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_NUMBER.value)
 def number_id_taking(message):
     log(message)
     number = message.text
-    # if len(number) != 6:
-    #     bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
-    #     dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
-    # else:
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    bot.send_message(message.chat.id, 'Введіть дату видачі ID-карти (у форматі РРРР-ММ-ДД):✍')
-    dbworker.set_state(message.chat.id, config.States.S_ID_DATE.value)
+    if len(number) != 9:
+        bot.send_message(message.chat.id, 'Номер ID-карти має містити 9 цифр. Спробуйте ще')
+        dbworker.set_state(message.chat.id, config.States.S_ID_NUMBER.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        bot.send_message(message.chat.id, 'Введіть дату видачі ID-карти (у форматі РРРР-ММ-ДД):✍')
+        dbworker.set_state(message.chat.id, config.States.S_ID_DATE.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_ID_DATE.value)
@@ -1014,13 +1039,18 @@ def date_id_taking(message):
 def issued_id_taking(message):
     log(message)
     issued_by = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE passport SET issued_by='%s' WHERE id='%s'" % (issued_by, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    prefinal(message)
+    if len(issued_by) != 4:
+        bot.send_message(message.chat.id, 'Орган видачі має містити 4 цифри. Спробуйте ще')
+        dbworker.set_state(message.chat.id, config.States.S_ID_ISSUED_BY.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE passport SET issued_by='%s' WHERE id='%s'" % (issued_by, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        prefinal(message)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -1032,43 +1062,50 @@ def driver_license(message):
     dbworker.set_state(message.chat.id, config.States.S_DRIVER_SERIES.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_SERIES.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_SERIES.value)
 def series_driver_taking(message):
     log(message)
     series = message.text
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("SELECT EXISTS(SELECT 1 FROM passport WHERE id='%s')" % message.from_user.id)
-    results1 = q.fetchone()
-    if results1[0] != 1:
-        q.execute("INSERT INTO 'passport' (id) VALUES ('%s')" % message.from_user.id)
-    q.execute("UPDATE passport SET series='%s' WHERE id='%s'" % (series, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    bot.send_message(message.chat.id, 'Введіть номер посвідчення:✍')
-    dbworker.set_state(message.chat.id, config.States.S_DRIVER_NUMBER.value)
+    if len(series) != 3:
+        bot.send_message(message.chat.id, 'Серія посвідчення має містити 3 символи. Спробуйте ще')
+        driver_license(message)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("SELECT EXISTS(SELECT 1 FROM passport WHERE id='%s')" % message.from_user.id)
+        results1 = q.fetchone()
+        if results1[0] != 1:
+            q.execute("INSERT INTO 'passport' (id) VALUES ('%s')" % message.from_user.id)
+        q.execute("UPDATE passport SET series='%s' WHERE id='%s'" % (series, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        bot.send_message(message.chat.id, 'Введіть номер посвідчення:✍')
+        dbworker.set_state(message.chat.id, config.States.S_DRIVER_NUMBER.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_NUMBER.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_NUMBER.value)
 def number_driver_taking(message):
     log(message)
     number = message.text
-    # if len(number) != 6:
-    #     bot.send_message(message.chat.id, 'Номер паспорта має містити 6 цифр. Спробуйте ще')
-    #     dbworker.set_state(message.chat.id, config.States.S_NUMBER.value)
-    # else:
-    connection = sql.connect('DATABASE.sqlite')
-    q = connection.cursor()
-    q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
-    connection.commit()
-    q.close()
-    connection.close()
-    bot.send_message(message.chat.id, 'Введіть дату видачі посвідчення (у форматі РРРР-ММ-ДД):✍')
-    dbworker.set_state(message.chat.id, config.States.S_DRIVER_DATE.value)
+    if len(number) != 6:
+        bot.send_message(message.chat.id, 'Номер посвідчення має містити 6 цифр. Спробуйте ще')
+        dbworker.set_state(message.chat.id, config.States.S_DRIVER_NUMBER.value)
+    else:
+        connection = sql.connect('DATABASE.sqlite')
+        q = connection.cursor()
+        q.execute("UPDATE passport SET number='%s' WHERE id='%s'" % (number, message.from_user.id))
+        connection.commit()
+        q.close()
+        connection.close()
+        bot.send_message(message.chat.id, 'Введіть дату видачі посвідчення (у форматі РРРР-ММ-ДД):✍')
+        dbworker.set_state(message.chat.id, config.States.S_DRIVER_DATE.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_DATE.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_DRIVER_DATE.value)
 def date_driver_taking(message):
     log(message)
     date = message.text
@@ -1450,7 +1487,7 @@ def yes(message):
         bot.send_message(message.chat.id, 'Якісь дані були введені некоректно. Спробуйте ще')
         bad_data = 1
     if bad_data == 1:
-        auto_number(message)
+        prefinal(message)
     else:
         contract = utility.get(str(message.chat.id) + 'contract_id')
         url_for_req = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/state/REQUEST'
@@ -1617,9 +1654,18 @@ def no(message):
     button11 = types.KeyboardButton('Номер документа')
     button12 = types.KeyboardButton('Дата видачі')
     button13 = types.KeyboardButton('Орган видачі')
-    markup.add(button1, button2, button3, button4, button5, button6, button7, button8, button9, button10, button11,
+    button14 = types.KeyboardButton('Авто')
+    markup.add(button14, button1, button2, button3, button4, button5, button6, button7, button8, button9, button10,
+               button11,
                button12, button13)
     bot.send_message(message.chat.id, 'Виберіть що хочете змінити:', reply_markup=markup)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Авто')
+def change_auto(message):
+    utility.update({str(message.chat.id) + 'car_changer': '1'})
+    print(utility.get(str(message.chat.id) + 'car_changer'))
+    auto_number(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'Рік випуску')
