@@ -365,6 +365,21 @@ def hello(message):
 
 @bot.message_handler(func=lambda message: message.text == 'ПІДІБРАТИ ПОЛІС 🚘')
 def auto_number(message):
+    try:
+        utility.pop(str(message.chat.id) + 'city1')
+        utility.pop(str(message.chat.id) + 'city2')
+        utility.pop(str(message.chat.id) + 'city3')
+        utility.pop(str(message.chat.id) + 'city4')
+        utility.pop(str(message.chat.id) + 'tariff1')
+        utility.pop(str(message.chat.id) + 'tariff2')
+        utility.pop(str(message.chat.id) + 'tariff3')
+        utility.pop(str(message.chat.id) + 'tariff4')
+        utility.pop(str(message.chat.id) + 'tariff5')
+        utility.pop(str(message.chat.id) + 'tariff6')
+        utility.pop(str(message.chat.id) + 'tariff7')
+        utility.pop(str(message.chat.id) + 'tariff8')
+    except KeyError:
+        pass
     bot.send_message(message.chat.id, 'Введіть реєстраційний номер авто (АА0000АА):✍')
     dbworker.set_state(message.chat.id, config.States.S_NUMBER_CAR.value)
 
@@ -974,7 +989,7 @@ def issued_taking(message):
 @bot.message_handler(func=lambda message: message.text == 'ID-карта')
 def id_card(message):
     utility.update({str(message.chat.id) + 'doc_type': 'ID_PASSPORT'})
-    bot.send_message(message.chat.id, 'Введіть запис ID карти:✍')
+    bot.send_message(message.chat.id, 'Введіть запис ID карти(14 символів):✍')
     dbworker.set_state(message.chat.id, config.States.S_ID_SERIES.value)
 
 
@@ -997,7 +1012,7 @@ def series_id_taking(message):
         connection.commit()
         q.close()
         connection.close()
-        bot.send_message(message.chat.id, 'Введіть номер ID-карти:✍')
+        bot.send_message(message.chat.id, 'Введіть номер ID-карти(9 цифр):✍')
         dbworker.set_state(message.chat.id, config.States.S_ID_NUMBER.value)
 
 
@@ -1030,7 +1045,7 @@ def date_id_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    bot.send_message(message.chat.id, 'Введіть орган, що видав ID-карту:✍')
+    bot.send_message(message.chat.id, 'Введіть орган, що видав ID-карту(4 цифри):✍')
     dbworker.set_state(message.chat.id, config.States.S_ID_ISSUED_BY.value)
 
 
@@ -1058,7 +1073,7 @@ def issued_id_taking(message):
 @bot.message_handler(func=lambda message: message.text == 'Посвідчення водія 🚘')
 def driver_license(message):
     utility.update({str(message.chat.id) + 'doc_type': 'DRIVING_LICENSE'})
-    bot.send_message(message.chat.id, 'Введіть серію посвідчення:✍')
+    bot.send_message(message.chat.id, 'Введіть серію посвідчення(3 символи):✍')
     dbworker.set_state(message.chat.id, config.States.S_DRIVER_SERIES.value)
 
 
@@ -1081,7 +1096,7 @@ def series_driver_taking(message):
         connection.commit()
         q.close()
         connection.close()
-        bot.send_message(message.chat.id, 'Введіть номер посвідчення:✍')
+        bot.send_message(message.chat.id, 'Введіть номер посвідчення(6 цифр):✍')
         dbworker.set_state(message.chat.id, config.States.S_DRIVER_NUMBER.value)
 
 
