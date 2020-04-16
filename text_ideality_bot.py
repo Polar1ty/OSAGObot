@@ -292,75 +292,77 @@ def hello(message):
     q = connection.cursor()
     q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
     results1 = q.fetchone()
-    if results1[0] != 1:
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-        button1 = types.KeyboardButton('ПІДІБРАТИ ПОЛІС 🚘')
-        markup.add(button1)
-        bot.send_message(message.chat.id,
-                         'Вітаємо, {0.first_name}! Я - бот {1.first_name}, готовий працювати.\nПочати - /start\nПерезавантажити бота - /reset\nПравила користування - /rules\nДопомога - /help'.format(
-                             message.from_user, bot.get_me()), reply_markup=markup)
-        q.execute("INSERT INTO 'user' (id) VALUES ('%s')" % message.from_user.id)
-        connection.commit()
-        q.close()
-        connection.close()
-        utility = {
-            str(message.chat.id) + 'city1': '',
-            str(message.chat.id) + 'city2': '',
-            str(message.chat.id) + 'city3': '',
-            str(message.chat.id) + 'city4': '',
-            str(message.chat.id) + 'final_city_id': '',
-            str(message.chat.id) + 'tariff1': '',
-            str(message.chat.id) + 'tariff2': '',
-            str(message.chat.id) + 'tariff3': '',
-            str(message.chat.id) + 'tariff4': '',
-            str(message.chat.id) + 'tariff5': '',
-            str(message.chat.id) + 'tariff6': '',
-            str(message.chat.id) + 'tariff7': '',
-            str(message.chat.id) + 'tariff8': '',
-            str(message.chat.id) + 'tariff_type': '',
-            str(message.chat.id) + 'tariff_id': '',
-            str(message.chat.id) + 'tariff_payment': '',
-            str(message.chat.id) + 'tariff_discounted_payment': '',
-            str(message.chat.id) + 'tariff_name': '',
-            str(message.chat.id) + 'doc_type': '',
-            str(message.chat.id) + 'contract_id': '',
-            str(message.chat.id) + 'min_bonus_malus': '',
-            str(message.chat.id) + 'car_year': '',
-            str(message.chat.id) + 'order': '',
-            str(message.chat.id) + 'car_changer': ''
-        }
-    else:
-        bot.send_message(message.chat.id,
-                         'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
-        connection.commit()
-        q.close()
-        connection.close()
-        utility = {
-            str(message.chat.id) + 'city1': '',
-            str(message.chat.id) + 'city2': '',
-            str(message.chat.id) + 'city3': '',
-            str(message.chat.id) + 'city4': '',
-            str(message.chat.id) + 'final_city_id': '',
-            str(message.chat.id) + 'tariff1': '',
-            str(message.chat.id) + 'tariff2': '',
-            str(message.chat.id) + 'tariff3': '',
-            str(message.chat.id) + 'tariff4': '',
-            str(message.chat.id) + 'tariff5': '',
-            str(message.chat.id) + 'tariff6': '',
-            str(message.chat.id) + 'tariff7': '',
-            str(message.chat.id) + 'tariff8': '',
-            str(message.chat.id) + 'tariff_type': '',
-            str(message.chat.id) + 'tariff_id': '',
-            str(message.chat.id) + 'tariff_payment': '',
-            str(message.chat.id) + 'tariff_discounted_payment': '',
-            str(message.chat.id) + 'tariff_name': '',
-            str(message.chat.id) + 'doc_type': '',
-            str(message.chat.id) + 'contract_id': '',
-            str(message.chat.id) + 'min_bonus_malus': '',
-            str(message.chat.id) + 'car_year': '',
-            str(message.chat.id) + 'order': ''
-        }
-        prefinal(message)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    button1 = types.KeyboardButton('ПІДІБРАТИ ПОЛІС 🚘')
+    markup.add(button1)
+    bot.send_message(message.chat.id,
+                     'Вітаємо, {0.first_name}! Я - бот {1.first_name}, готовий працювати.\nПочати - /start\nПерезавантажити бота - /reset\nПравила користування - /rules\nДопомога - /help'.format(
+                         message.from_user, bot.get_me()), reply_markup=markup)
+    q.execute("INSERT INTO 'user' (id) VALUES ('%s')" % message.from_user.id)
+    connection.commit()
+    q.close()
+    connection.close()
+    utility = {
+        str(message.chat.id) + 'city1': '',
+        str(message.chat.id) + 'city2': '',
+        str(message.chat.id) + 'city3': '',
+        str(message.chat.id) + 'city4': '',
+        str(message.chat.id) + 'final_city_id': '',
+        str(message.chat.id) + 'tariff1': '',
+        str(message.chat.id) + 'tariff2': '',
+        str(message.chat.id) + 'tariff3': '',
+        str(message.chat.id) + 'tariff4': '',
+        str(message.chat.id) + 'tariff5': '',
+        str(message.chat.id) + 'tariff6': '',
+        str(message.chat.id) + 'tariff7': '',
+        str(message.chat.id) + 'tariff8': '',
+        str(message.chat.id) + 'tariff_type': '',
+        str(message.chat.id) + 'tariff_id': '',
+        str(message.chat.id) + 'tariff_payment': '',
+        str(message.chat.id) + 'tariff_discounted_payment': '',
+        str(message.chat.id) + 'tariff_name': '',
+        str(message.chat.id) + 'doc_type': '',
+        str(message.chat.id) + 'contract_id': '',
+        str(message.chat.id) + 'min_bonus_malus': '',
+        str(message.chat.id) + 'car_year': '',
+        str(message.chat.id) + 'order': '',
+        str(message.chat.id) + 'car_changer': ''
+    }
+
+    # Saved for better times
+
+    # else:
+    #     bot.send_message(message.chat.id,
+    #                      'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
+    #     connection.commit()
+    #     q.close()
+    #     connection.close()
+    #     utility = {
+    #         str(message.chat.id) + 'city1': '',
+    #         str(message.chat.id) + 'city2': '',
+    #         str(message.chat.id) + 'city3': '',
+    #         str(message.chat.id) + 'city4': '',
+    #         str(message.chat.id) + 'final_city_id': '',
+    #         str(message.chat.id) + 'tariff1': '',
+    #         str(message.chat.id) + 'tariff2': '',
+    #         str(message.chat.id) + 'tariff3': '',
+    #         str(message.chat.id) + 'tariff4': '',
+    #         str(message.chat.id) + 'tariff5': '',
+    #         str(message.chat.id) + 'tariff6': '',
+    #         str(message.chat.id) + 'tariff7': '',
+    #         str(message.chat.id) + 'tariff8': '',
+    #         str(message.chat.id) + 'tariff_type': '',
+    #         str(message.chat.id) + 'tariff_id': '',
+    #         str(message.chat.id) + 'tariff_payment': '',
+    #         str(message.chat.id) + 'tariff_discounted_payment': '',
+    #         str(message.chat.id) + 'tariff_name': '',
+    #         str(message.chat.id) + 'doc_type': '',
+    #         str(message.chat.id) + 'contract_id': '',
+    #         str(message.chat.id) + 'min_bonus_malus': '',
+    #         str(message.chat.id) + 'car_year': '',
+    #         str(message.chat.id) + 'order': ''
+    #     }
+    #     prefinal(message)
 
 
 @bot.message_handler(func=lambda message: message.text == 'ПІДІБРАТИ ПОЛІС 🚘')
@@ -391,7 +393,6 @@ def asking_city(message):
     number_car = urllib.parse.quote(message.text)
     url = f'https://web.ewa.ua/ewa/api/v9/auto/mtibu/number?query={number_car}'
     response = requests.get(url, headers=headers, cookies=cookies)
-    print(response.json())
     try:
         model = response.json()[0]['modelText']
         vin_code = str(response.json()[0]['bodyNumber']).upper()
