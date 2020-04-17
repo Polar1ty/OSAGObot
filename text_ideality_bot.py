@@ -23,6 +23,37 @@ def log(message):
                                                           str(message.from_user.id), message.text))
 
 
+def remember(message):
+    bot.send_message(message.chat.id,
+                         'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
+    utility = {
+            str(message.chat.id) + 'city1': '',
+            str(message.chat.id) + 'city2': '',
+            str(message.chat.id) + 'city3': '',
+            str(message.chat.id) + 'city4': '',
+            str(message.chat.id) + 'final_city_id': '',
+            str(message.chat.id) + 'tariff1': '',
+            str(message.chat.id) + 'tariff2': '',
+            str(message.chat.id) + 'tariff3': '',
+            str(message.chat.id) + 'tariff4': '',
+            str(message.chat.id) + 'tariff5': '',
+            str(message.chat.id) + 'tariff6': '',
+            str(message.chat.id) + 'tariff7': '',
+            str(message.chat.id) + 'tariff8': '',
+            str(message.chat.id) + 'tariff_type': '',
+            str(message.chat.id) + 'tariff_id': '',
+            str(message.chat.id) + 'tariff_payment': '',
+            str(message.chat.id) + 'tariff_discounted_payment': '',
+            str(message.chat.id) + 'tariff_name': '',
+            str(message.chat.id) + 'doc_type': '',
+            str(message.chat.id) + 'contract_id': '',
+            str(message.chat.id) + 'min_bonus_malus': '',
+            str(message.chat.id) + 'car_year': '',
+            str(message.chat.id) + 'order': ''
+    }
+    prefinal(message)
+
+
 def tariff_parsing(tariff):
     insurer_name = tariff['tariff']['insurer']['namePrint']
     payment = tariff['payment']
@@ -329,41 +360,6 @@ def hello(message):
         str(message.chat.id) + 'car_changer': ''
     }
 
-    # Saved for better times
-
-    # else:
-    #     bot.send_message(message.chat.id,
-    #                      'Я пам\'ятаю вас! Якщо все вірно натисніть - Так✅\n Якщо треба змінити особисту інформацію або ж паспортні дані натисніть - Змінити❎\nЩоб змінити транспортний засіб, або тариф. Натисніть - Спочатку🔄')
-    #     connection.commit()
-    #     q.close()
-    #     connection.close()
-    #     utility = {
-    #         str(message.chat.id) + 'city1': '',
-    #         str(message.chat.id) + 'city2': '',
-    #         str(message.chat.id) + 'city3': '',
-    #         str(message.chat.id) + 'city4': '',
-    #         str(message.chat.id) + 'final_city_id': '',
-    #         str(message.chat.id) + 'tariff1': '',
-    #         str(message.chat.id) + 'tariff2': '',
-    #         str(message.chat.id) + 'tariff3': '',
-    #         str(message.chat.id) + 'tariff4': '',
-    #         str(message.chat.id) + 'tariff5': '',
-    #         str(message.chat.id) + 'tariff6': '',
-    #         str(message.chat.id) + 'tariff7': '',
-    #         str(message.chat.id) + 'tariff8': '',
-    #         str(message.chat.id) + 'tariff_type': '',
-    #         str(message.chat.id) + 'tariff_id': '',
-    #         str(message.chat.id) + 'tariff_payment': '',
-    #         str(message.chat.id) + 'tariff_discounted_payment': '',
-    #         str(message.chat.id) + 'tariff_name': '',
-    #         str(message.chat.id) + 'doc_type': '',
-    #         str(message.chat.id) + 'contract_id': '',
-    #         str(message.chat.id) + 'min_bonus_malus': '',
-    #         str(message.chat.id) + 'car_year': '',
-    #         str(message.chat.id) + 'order': ''
-    #     }
-    #     prefinal(message)
-
 
 @bot.message_handler(func=lambda message: message.text == 'ПІДІБРАТИ ПОЛІС 🚘')
 def auto_number(message):
@@ -603,8 +599,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff2')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff2")[3]})
@@ -624,8 +619,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff3')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff3")[3]})
@@ -666,8 +660,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff5')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff5")[3]})
@@ -687,8 +680,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff6')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff6")[3]})
@@ -708,8 +700,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff7')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff7")[3]})
@@ -729,8 +720,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
         if int(call.data) == utility.get(str(call.message.chat.id) + 'tariff8')[3]:
             utility.update(
                 {str(call.message.chat.id) + 'tariff_id': utility.get(str(call.message.chat.id) + "tariff8")[3]})
@@ -750,8 +740,7 @@ def callback_inline(call):
                                  'Добре!👍\nВведіть рік випуску автомобіля\n(пункт B.2 свідоцтва про реєстрацію ТЗ)✍')
                 dbworker.set_state(call.message.chat.id, config.States.S_CAR_YEAR.value)
             else:
-                bot.send_message(call.message.chat.id, 'Введіть своє прізвище (українською):')
-                dbworker.set_state(call.message.chat.id, config.States.S_SURNAME.value)
+                remember(call.message)
     except IndexError:
         pass
     except TypeError:
