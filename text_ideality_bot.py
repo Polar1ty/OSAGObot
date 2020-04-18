@@ -319,6 +319,8 @@ def rules(message):
 @bot.message_handler(commands=['start'])
 def hello(message):
     tg_analytic.statistics(message.chat.id, message.text)
+    bot.send_chat_action(message.chat.id, action='typing')
+    time.sleep(1)
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
@@ -474,6 +476,8 @@ def final_city(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_REGISTRATION_CITY.value)
 def submitting(message):
+    bot.send_chat_action(message.chat.id, action='typing')
+    time.sleep(1.5)
     bot.send_message(message.chat.id, 'Виберіть ваш найкращий варіант:👇')
     try:
         if message.text == utility.get(str(message.chat.id) + 'city1')['name_full']:
@@ -1139,6 +1143,8 @@ def issued_driver_taking(message):
 
 
 def prefinal(message):
+    bot.send_chat_action(message.chat.id, action='typing')
+    time.sleep(1.5)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     button1 = types.KeyboardButton('Так✔')
     button2 = types.KeyboardButton('Змінити✖')
