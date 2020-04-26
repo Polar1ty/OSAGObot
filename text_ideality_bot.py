@@ -149,7 +149,7 @@ data = {
     'email': config.email,
     'password': config.password  # hashed
 }
-response = requests.post('https://web.ewa.ua/ewa/api/v9/user/login', headers=headers, data=data)
+response = requests.post('https://web.ewa.ua/ewa/api/v10/user/login', headers=headers, data=data)
 cookie = response.json()['sessionId']
 sale_point = response.json()['user']['salePoint']['id']
 user = response.json()['user']['id']
@@ -388,9 +388,25 @@ def auto_number(message):
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_NUMBER_CAR.value)
 def asking_city(message):
     log(message)
+    headers = {
+        'content-type': 'application/x-www-form-urlencoded',
+    }
+    data = {
+        'email': config.email,
+        'password': config.password  # hashed
+    }
+    response = requests.post('https://web.ewa.ua/ewa/api/v10/user/login', headers=headers, data=data)
+    cookie = response.json()['sessionId']
+    cookies = {
+        'JSESSIONID': cookie
+    }
+    headers = {
+        'content-type': 'application/json'
+    }
     number_car = urllib.parse.quote(message.text)
-    url = f'https://web.ewa.ua/ewa/api/v9/auto/mtibu/number?query={number_car}'
+    url = f'https://web.ewa.ua/ewa/api/v10/auto/mtibu/number?query={number_car}'
     response = requests.get(url, headers=headers, cookies=cookies)
+    print(response.text)
     try:
         model = response.json()[0]['modelText']
         vin_code = str(response.json()[0]['bodyNumber']).upper()
@@ -427,6 +443,9 @@ def asking_city(message):
             dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
     except IndexError:
         bot.send_message(message.chat.id, 'Такого номера не існує. Спробуйте ще раз')
+    except json.decoder.JSONDecodeError:
+        print('json.decoder.JSONDecodeError again blyat i dont know why')
+        bot.send_message(message.chat.id, 'Помилка авторизації. Спробуйте ще раз')
 
 
 @bot.message_handler(
@@ -1615,14 +1634,13 @@ def otp(message):
 
 @bot.pre_checkout_query_handler(func=lambda query: True)
 def process_pre_checkout_query(pre_checkout_query: types.PreCheckoutQuery):
+    print('Button pressed!!!')
     bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
 
 
 @bot.message_handler(content_types='successful_payment')
 def process_successful_payment(message: types.Message):
     print(message.successful_payment)
-    # total_amount = message.successful_payment['total_amount']  TypeError: 'SuccessfulPayment' object is not subscriptable
-    # payload = message.successful_payment['invoice_payload']
     print('Платёж прошел. Всё найс')
     contract = utility.get(str(message.chat.id) + 'contract_id')
     url_for_emi = f'https://web.ewa.ua/ewa/api/v9/contract/{contract}/state/EMITTED'
