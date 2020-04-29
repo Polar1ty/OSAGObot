@@ -320,7 +320,7 @@ def rules(message):
 def hello(message):
     tg_analytic.statistics(message.chat.id, message.text)
     bot.send_chat_action(message.chat.id, action='typing')
-    time.sleep(1)
+    time.sleep(0.5)
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("SELECT EXISTS(SELECT 1 FROM user WHERE id='%s')" % message.from_user.id)
@@ -443,9 +443,6 @@ def asking_city(message):
             dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
     except IndexError:
         bot.send_message(message.chat.id, 'Такого номера не існує. Спробуйте ще раз')
-    except json.decoder.JSONDecodeError:
-        print('json.decoder.JSONDecodeError again blyat i dont know why')
-        bot.send_message(message.chat.id, 'Помилка авторизації. Спробуйте ще раз')
 
 
 @bot.message_handler(
@@ -456,6 +453,7 @@ def final_city(message):
     url = f'https://web.ewa.ua/ewa/api/v9/place?country=UA&query={registration_city}'
     city_response = requests.get(url, headers=headers, cookies=cookies)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    print(city_response.text)
     if city_response.json() == []:
         bot.send_message(message.chat.id, 'Таке місто не знайдено. Спробуйте ще раз')
         dbworker.set_state(message.chat.id, config.States.S_SEARCH_CITY.value)
@@ -496,7 +494,7 @@ def final_city(message):
     func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_REGISTRATION_CITY.value)
 def submitting(message):
     bot.send_chat_action(message.chat.id, action='typing')
-    time.sleep(1.5)
+    time.sleep(0.5)
     bot.send_message(message.chat.id, 'Виберіть ваш найкращий варіант:👇')
     try:
         if message.text == utility.get(str(message.chat.id) + 'city1')['name_full']:
@@ -895,24 +893,52 @@ def email_taking(message):
     connection.commit()
     q.close()
     connection.close()
-    # database
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    button1 = types.KeyboardButton('Поділитися номером', request_contact=True)
+    button2 = types.KeyboardButton('Ввести власноруч')
+    markup.add(button1, button2)
     bot.send_message(message.chat.id,
-                     'Введіть номер телефону, на який ми вишлемо СМС для підпису електронного полісу (має починатися на +380):✍')
+                     'Поділіться своїм номером ☎️, на який ми вишлемо СМС для підпису електронного полісу:✍', reply_markup=markup)
+    dbworker.clear_db(message.chat.id)
+
+
+@bot.message_handler(func=lambda message: message.text == 'Ввести власноруч')
+def input_phone(message):
+    bot.send_message(message.chat.id,
+                     'Введіть ваш номер телефону(має починатися на +380):✍')
     dbworker.set_state(message.chat.id, config.States.S_PHONE.value)
+
+
+@bot.message_handler(content_types=['contact'])
+def getting_contact(message):
+    phone = message.contact.phone_number
+    print(phone, type(phone))
+    connection = sql.connect('DATABASE.sqlite')
+    q = connection.cursor()
+    q.execute("UPDATE user SET phone='%s' WHERE id='%s'" % (str(phone), message.from_user.id))
+    connection.commit()
+    q.close()
+    connection.close()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    button1 = types.KeyboardButton('Паспорт 📖')
+    button2 = types.KeyboardButton('ID-карта')
+    button3 = types.KeyboardButton('Посвідчення водія 🚘')
+    markup.add(button1, button2, button3)
+    bot.send_message(message.chat.id, 'Ваш документ:', reply_markup=markup)
+    dbworker.clear_db(message.chat.id)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.chat.id) == config.States.S_PHONE.value)
 def phone_taking(message):
     log(message)
     phone = message.text
+    print(phone, type(phone))
     connection = sql.connect('DATABASE.sqlite')
     q = connection.cursor()
     q.execute("UPDATE user SET phone='%s' WHERE id='%s'" % (phone, message.from_user.id))
     connection.commit()
     q.close()
     connection.close()
-    # bot.send_message(message.chat.id, 'Введіть серію паспорта (2 літери):✍')
-    # dbworker.set_state(message.chat.id, config.States.S_SERIES.value)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     button1 = types.KeyboardButton('Паспорт 📖')
     button2 = types.KeyboardButton('ID-карта')
@@ -1163,7 +1189,7 @@ def issued_driver_taking(message):
 
 def prefinal(message):
     bot.send_chat_action(message.chat.id, action='typing')
-    time.sleep(1.5)
+    time.sleep(0.5)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     button1 = types.KeyboardButton('Так✔')
     button2 = types.KeyboardButton('Змінити✖')
